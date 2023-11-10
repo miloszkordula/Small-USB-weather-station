@@ -130,9 +130,13 @@
   <ItemGroup>
     <ClCompile Include="lib\serialib.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sensor.cpp" />
+    <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\serialib.h" />
+    <ClInclude Include="Sensor.h" />
+    <ClInclude Include="Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
