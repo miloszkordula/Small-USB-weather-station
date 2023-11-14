@@ -13,8 +13,7 @@ int Server::createServer() {
         printf("Initialization error.\n");
 
     SOCKET mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (mainSocket == INVALID_SOCKET)
-    {
+    if (mainSocket == INVALID_SOCKET)  {
         printf("Error creating socket: %ld\n", WSAGetLastError());
         WSACleanup();
         return 1;
@@ -37,6 +36,7 @@ int Server::createServer() {
     }
     printf("server created\n");
     this->mainSocket = mainSocket;
+    return 0;
 }
 
 int Server::handleClient(const char* comPort) {
@@ -53,6 +53,7 @@ int Server::handleClient(const char* comPort) {
     if (bytesRead == SOCKET_ERROR) {
         std::cerr << "Receive failed." << std::endl;
         closesocket(clientSocket);
+        return 0;
        // continue;
     }
 
@@ -62,7 +63,8 @@ int Server::handleClient(const char* comPort) {
         std::ifstream file("./html/index.html");
         if (file.is_open()) {
             std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
-            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + std::to_string(content.length()) + "\r\n\r\n" + content;
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " 
+                + std::to_string(content.length()) + "\r\n\r\n" + content;
             send(clientSocket, response.c_str(), response.length(), 0);
         }
         else {
@@ -75,7 +77,8 @@ int Server::handleClient(const char* comPort) {
         printf("style\n");
         if (file.is_open()) {
             std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
-            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/css\r\nContent-Length: " + std::to_string(content.length()) + "\r\n\r\n" + content;
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/css\r\nContent-Length: " 
+                + std::to_string(content.length()) + "\r\n\r\n" + content;
             send(clientSocket, response.c_str(), response.length(), 0);
         }
         else {
@@ -88,7 +91,8 @@ int Server::handleClient(const char* comPort) {
         printf("main\n");
         if (file.is_open()) {
             std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
-            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/javascript\r\nContent-Length: " + std::to_string(content.length()) + "\r\n\r\n" + content;
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/javascript\r\nContent-Length: " 
+                + std::to_string(content.length()) + "\r\n\r\n" + content;
             send(clientSocket, response.c_str(), response.length(), 0);
         }
         else {
@@ -109,7 +113,8 @@ int Server::handleClient(const char* comPort) {
         // Serialize the JSON document to a string
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " 
+            + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
         send(clientSocket, response.c_str(), response.length(), 0);
     }
     else {
@@ -117,4 +122,5 @@ int Server::handleClient(const char* comPort) {
         send(clientSocket, response.c_str(), response.length(), 0);
     }
     closesocket(clientSocket);
+    return 0;
 }

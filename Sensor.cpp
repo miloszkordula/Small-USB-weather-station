@@ -4,7 +4,10 @@
 int Sensor::update(const char* comPort) {
     serialib serial;
     char errorOpening = serial.openDevice(comPort, 9600);
-    if (errorOpening != 1) return errorOpening;
+    if (errorOpening != 1) {
+        printf("Error connecting to %s %i\n",comPort, (int)errorOpening);
+        return errorOpening;
+    }
     printf("Successful connection to %s\n", comPort);
 
     char buffer[128] = "";
@@ -13,9 +16,7 @@ int Sensor::update(const char* comPort) {
     while (strlen(buffer) < 10) {
         serial.readString(buffer, '\n', 128, 4000);
         printf("String read: %s\n", buffer);
-        // Create an input string stream from the input string
         std::istringstream iss(buffer);
-        // Use a loop to extract values
         while (iss) {
             std::string token;
             iss >> token;
@@ -30,10 +31,8 @@ int Sensor::update(const char* comPort) {
                 iss >> token >> this->humidity >> token >> token;
             }
         }
-
     }
-
-
+    return 1;
 }
 
 double Sensor::getTemperature() {
