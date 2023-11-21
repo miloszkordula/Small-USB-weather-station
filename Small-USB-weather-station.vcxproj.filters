@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="html">
+      <UniqueIdentifier>{58b6e7d8-e787-46b8-b78e-63cc5e89e493}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,5 +41,16 @@
     <ClInclude Include="Server.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="html\index.html">
+      <Filter>html</Filter>
+    </None>
+    <None Include="html\main.js">
+      <Filter>html</Filter>
+    </None>
+    <None Include="html\style.css">
+      <Filter>html</Filter>
+    </None>
   </ItemGroup>
 </Project>

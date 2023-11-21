@@ -31,6 +31,10 @@ int Sensor::update(const char* comPort) {
                 iss >> token >> this->humidity >> token >> token;
             }
         }
+        this->dewPoint = 
+            (this->temperature - (14.55 + 0.114 * this->temperature) * (1 - (0.01 * this->humidity)) 
+            - pow(((2.5 + 0.007 * this->temperature) * (1 - (0.01 * this->humidity))), 3) 
+            - (15.9 + 0.117 * this->temperature) * pow((1 - (0.01 * this->humidity)), 14));
     }
     return 1;
 }
@@ -45,4 +49,8 @@ double Sensor::getPressure() {
 
 double Sensor::getHumidity() {
     return this->humidity;
+}
+
+double Sensor::getDewPoint() {
+    return this->dewPoint;
 }

@@ -1,12 +1,12 @@
 var temperatureHistoryDiv = document.getElementById("temperature-history");
 var humidityHistoryDiv = document.getElementById("humidity-history");
 var pressureHistoryDiv = document.getElementById("pressure-history");
-var altitudeHistoryDiv = document.getElementById("altitude-history");
+var dewPointHistoryDiv = document.getElementById("dewPoint-history");
 
 var temperatureGaugeDiv = document.getElementById("temperature-gauge");
 var humidityGaugeDiv = document.getElementById("humidity-gauge");
 var pressureGaugeDiv = document.getElementById("pressure-gauge");
-var altitudeGaugeDiv = document.getElementById("altitude-gauge");
+var dewPointGaugeDiv = document.getElementById("dewPoint-gauge");
 
 // History Data
 var temperatureTrace = {
@@ -30,10 +30,10 @@ var pressureTrace = {
   mode: "lines+markers",
   type: "line",
 };
-var altitudeTrace = {
+var dewPointTrace = {
   x: [],
   y: [],
-  name: "Altitude",
+  name: "Dew Point",
   mode: "lines+markers",
   type: "line",
 };
@@ -80,10 +80,10 @@ var pressureLayout = {
   height: 260,
   margin: { t: 30, b: 20, pad: 5 },
 };
-var altitudeLayout = {
+var dewPointLayout = {
   autosize: false,
   title: {
-    text: "Altitude",
+    text: "Dew Point",
   },
   font: {
     size: 14,
@@ -98,7 +98,7 @@ var altitudeLayout = {
 Plotly.newPlot(temperatureHistoryDiv, [temperatureTrace], temperatureLayout);
 Plotly.newPlot(humidityHistoryDiv, [humidityTrace], humidityLayout);
 Plotly.newPlot(pressureHistoryDiv, [pressureTrace], pressureLayout);
-Plotly.newPlot(altitudeHistoryDiv, [altitudeTrace], altitudeLayout);
+Plotly.newPlot(dewPointHistoryDiv, [dewPointTrace], dewPointLayout);
 
 // Gauge Data
 var temperatureData = [
@@ -110,10 +110,10 @@ var temperatureData = [
     mode: "gauge+number+delta",
     delta: { reference: 30 },
     gauge: {
-      axis: { range: [null, 50] },
+        axis: { range: [-10, 40] },
       steps: [
-        { range: [0, 20], color: "lightgray" },
-        { range: [20, 30], color: "gray" },
+        { range: [10, 30], color: "lightgray" },
+        { range: [18, 25], color: "gray" },
       ],
       threshold: {
         line: { color: "red", width: 4 },
@@ -135,13 +135,13 @@ var humidityData = [
     gauge: {
       axis: { range: [null, 100] },
       steps: [
-        { range: [0, 20], color: "lightgray" },
-        { range: [20, 30], color: "gray" },
+        { range: [20, 80], color: "lightgray" },
+        { range: [40, 60], color: "gray" },
       ],
       threshold: {
         line: { color: "red", width: 4 },
         thickness: 0.75,
-        value: 30,
+        value: 20,
       },
     },
   },
@@ -156,38 +156,38 @@ var pressureData = [
     mode: "gauge+number+delta",
     delta: { reference: 750 },
     gauge: {
-      axis: { range: [null, 1100] },
+      axis: { range: [900, 1100] },
       steps: [
-        { range: [0, 300], color: "lightgray" },
-        { range: [300, 700], color: "gray" },
+        { range: [950, 1050], color: "lightgray" },
+        { range: [980, 1020], color: "gray" },
       ],
       threshold: {
         line: { color: "red", width: 4 },
         thickness: 0.75,
-        value: 30,
+        value: 1050,
       },
     },
   },
 ];
 
-var altitudeData = [
+var dewPointData = [
   {
     domain: { x: [0, 1], y: [0, 1] },
     value: 0,
-    title: { text: "Altitude" },
+    title: { text: "Dew Point" },
     type: "indicator",
     mode: "gauge+number+delta",
     delta: { reference: 60 },
     gauge: {
-      axis: { range: [null, 150] },
+      axis: { range: [-20, 30] },
       steps: [
-        { range: [0, 50], color: "lightgray" },
-        { range: [50, 100], color: "gray" },
+        { range: [0, 20], color: "lightgray" },
+        { range: [8, 15], color: "gray" },
       ],
       threshold: {
         line: { color: "red", width: 4 },
         thickness: 0.75,
-        value: 30,
+        value: 0,
       },
     },
   },
@@ -198,7 +198,7 @@ var layout = { width: 300, height: 250, margin: { t: 0, b: 0, l: 0, r: 0 } };
 Plotly.newPlot(temperatureGaugeDiv, temperatureData, layout);
 Plotly.newPlot(humidityGaugeDiv, humidityData, layout);
 Plotly.newPlot(pressureGaugeDiv, pressureData, layout);
-Plotly.newPlot(altitudeGaugeDiv, altitudeData, layout);
+Plotly.newPlot(dewPointGaugeDiv, dewPointData, layout);
 
 // Will hold the arrays we receive from our BME280 sensor
 // Temperature
@@ -210,9 +210,9 @@ let newHumidityYArray = [];
 // Pressure
 let newPressureXArray = [];
 let newPressureYArray = [];
-// Altitude
-let newAltitudeXArray = [];
-let newAltitudeYArray = [];
+// dewPoint
+let newDewPointXArray = [];
+let newDewPointYArray = [];
 
 // The maximum number of data points displayed on our scatter/line graph
 let MAX_GRAPH_POINTS = 12;
@@ -226,11 +226,11 @@ function updateSensorReadings() {
       let temperature = jsonResponse.temperature.toFixed(2);
       let humidity = jsonResponse.humidity.toFixed(2);
       let pressure = jsonResponse.pressure.toFixed(2);
-      let altitude = jsonResponse.altitude.toFixed(2);
+      let dewPoint = jsonResponse.dewPoint.toFixed(2);
 
-      updateBoxes(temperature, humidity, pressure, altitude);
+      updateBoxes(temperature, humidity, pressure, dewPoint);
 
-      updateGauge(temperature, humidity, pressure, altitude);
+      updateGauge(temperature, humidity, pressure, dewPoint);
 
       // Update Temperature Line Chart
       updateCharts(
@@ -254,29 +254,29 @@ function updateSensorReadings() {
         pressure
       );
 
-      // Update Altitude Line Chart
+      // Update dewPoint Line Chart
       updateCharts(
-        altitudeHistoryDiv,
-        newAltitudeXArray,
-        newAltitudeYArray,
-        altitude
+        dewPointHistoryDiv,
+        newDewPointXArray,
+        newDewPointYArray,
+        dewPoint
       );
     });
 }
 
-function updateBoxes(temperature, humidity, pressure, altitude) {
+function updateBoxes(temperature, humidity, pressure, dewPoint) {
   let temperatureDiv = document.getElementById("temperature");
   let humidityDiv = document.getElementById("humidity");
   let pressureDiv = document.getElementById("pressure");
-  let altitudeDiv = document.getElementById("altitude");
+  let dewPointDiv = document.getElementById("dewPoint");
 
-  temperatureDiv.innerHTML = temperature + " C";
+  temperatureDiv.innerHTML = temperature + " *C";
   humidityDiv.innerHTML = humidity + " %";
   pressureDiv.innerHTML = pressure + " hPa";
-  altitudeDiv.innerHTML = altitude + " m";
+  dewPointDiv.innerHTML = dewPoint + " *C";
 }
 
-function updateGauge(temperature, humidity, pressure, altitude) {
+function updateGauge(temperature, humidity, pressure, dewPoint) {
   var temperature_update = {
     value: temperature,
   };
@@ -286,13 +286,13 @@ function updateGauge(temperature, humidity, pressure, altitude) {
   var pressure_update = {
     value: pressure,
   };
-  var altitude_update = {
-    value: altitude,
+    var dewPoint_update = {
+    value: dewPoint,
   };
   Plotly.update(temperatureGaugeDiv, temperature_update);
   Plotly.update(humidityGaugeDiv, humidity_update);
   Plotly.update(pressureGaugeDiv, pressure_update);
-  Plotly.update(altitudeGaugeDiv, altitude_update);
+  Plotly.update(dewPointGaugeDiv, dewPoint_update);
 }
 
 function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {

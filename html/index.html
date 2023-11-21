@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Arduino BME280 Weather Station</title>
+    <title>USB weather station</title>
     <link
       href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
       rel="stylesheet"
@@ -14,10 +14,6 @@
   </head>
   <body>
     <div class="sidebar">
-      <div class="logo-details">
-        <i class='bx bx-microchip'></i>
-        <span class="logo_name">donskytech</span>
-      </div>
       <ul class="nav-links">
         <li>
           <a href="#" class="active">
@@ -31,7 +27,7 @@
       <nav>
         <div class="sidebar-button">
           <i class="bx bx-menu sidebarBtn"></i>
-          <span class="dashboard">Arduino BME280 Weather Station Dashboard</span>
+          <span class="dashboard">USB BME280 Weather Station Dashboard</span>
         </div>
       </nav>
       <div class="home-content">
@@ -60,7 +56,7 @@
           <div class="box">
             <div class="right-side">
               <div class="box-topic">Approx Altitude</div>
-              <div class="number" id="altitude"></div>
+              <div class="number" id="dewPoint"></div>
             </div>
             <i class="bx bxs-building readings four"></i>
           </div>
@@ -75,7 +71,7 @@
               </div>
               <div class="history-col-item">
                 <div id="pressure-history" class="history-divs"></div>
-                <div id="altitude-history" class="history-divs"></div>
+                <div id="dewPoint-history" class="history-divs"></div>
               </div>
             </div>
           </div>
@@ -85,7 +81,7 @@
               <div class="gauge-box"><div id="temperature-gauge"></div></div>
               <div class="gauge-box"><div id="humidity-gauge"></div></div>
               <div class="gauge-box"><div id="pressure-gauge"></div></div>
-              <div class="gauge-box"><div id="altitude-gauge"></div></div>
+              <div class="gauge-box"><div id="dewPoint-gauge"></div></div>
             </div>
           </div>
         </div>

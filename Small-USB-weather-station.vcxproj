@@ -138,6 +138,11 @@
     <ClInclude Include="Sensor.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="html\index.html" />
+    <None Include="html\main.js" />
+    <None Include="html\style.css" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -107,7 +107,7 @@ int Server::handleClient(const char* comPort) {
         json["status"] = "ok";
         json["temperature"] = sensor.getTemperature();
         json["pressure"] = sensor.getPressure();
-        json["altitude"] = 250.0F;
+        json["dewPoint"] = sensor.getDewPoint();
         json["humidity"] = sensor.getHumidity();
 
         // Serialize the JSON document to a string
