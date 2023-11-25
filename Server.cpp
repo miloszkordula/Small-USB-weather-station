@@ -111,17 +111,57 @@ int Server::handleClient(const char* comPort) {
         json["humidity"] = sensor.getHumidity();
         json["timeStamp"] = sensor.getTime();
 
-        // Serialize the JSON document to a string
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
+        saveReadingsToFile(jsonResponse);
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " 
             + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
         send(clientSocket, response.c_str(), response.length(), 0);
+    }
+    else if (request.find("GET /history") != std::string::npos) {
+        std::string file_path = "history.json";
+        std::string history;
+        std::ifstream file(file_path);
+
+        if (!file.is_open()) {
+            std::cout << "Error opening the file!" << std::endl;
+         
+        }
+        else {
+            std::string line;
+            while (std::getline(file, line)) {
+                history += line + "\n";
+            }
+            file.close();
+            history += " \n]";
+
+            std::cout << "Histrory has been read" << std::endl;
+
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
+                + std::to_string(history.length()) + "\r\n\r\n" + history;
+            send(clientSocket, response.c_str(), response.length(), 0);
+        }
     }
     else {
         std::string response = "HTTP/1.1 404 Not Found\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>";
         send(clientSocket, response.c_str(), response.length(), 0);
     }
     closesocket(clientSocket);
+    return 0;
+}
+
+int Server::saveReadingsToFile(char readingsJSON[256]) {
+    std::string file_path = "history.json";
+    std::ofstream file;
+
+    file.open(file_path, std::ios::app);
+    if (!file.is_open()) {
+        std::cout << "Error opening the file!" << std::endl;
+        return 1;
+    }
+    file << ',' << std::endl << readingsJSON;
+    file.close();
+
+    std::cout << "Readings saved" << std::endl;
     return 0;
 }

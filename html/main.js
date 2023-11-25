@@ -8,94 +8,109 @@ var humidityGaugeDiv = document.getElementById("humidity-gauge");
 var pressureGaugeDiv = document.getElementById("pressure-gauge");
 var dewPointGaugeDiv = document.getElementById("dewPoint-gauge");
 
+let temperatureArray = [];
+let humidityArray = [];
+let pressureArray = [];
+let dewPointArray = [];
+let timeStampArray = [];
+
 // History Data
-var temperatureTrace = {
-  x: [],
-  y: [],
-  name: "Temperature",
-  mode: "lines+markers",
-  type: "line",
-};
-var humidityTrace = {
-  x: [],
-  y: [],
-  name: "Humidity",
-  mode: "lines+markers",
-  type: "line",
-};
-var pressureTrace = {
-  x: [],
-  y: [],
-  name: "Pressure",
-  mode: "lines+markers",
-  type: "line",
-};
-var dewPointTrace = {
-  x: [],
-  y: [],
-  name: "Dew Point",
-  mode: "lines+markers",
-  type: "line",
-};
+fetch(`/history`)
+    .then((response) => response.json())
+    .then((jsonResponse) => {
+        temperatureArray = jsonResponse.map(entry => entry.temperature.toFixed(2));
+        humidityArray = jsonResponse.map(entry => entry.humidity.toFixed(2));
+        pressureArray = jsonResponse.map(entry => entry.pressure.toFixed(2));
+        dewPointArray = jsonResponse.map(entry => entry.dewPoint.toFixed(2));
+        timeStampArray = jsonResponse.map(entry => entry.timeStamp);
 
-var temperatureLayout = {
-  autosize: true,
-  title: {
-    text: "Temperature",
-  },
-  font: {
-    size: 14,
-    color: "#7f7f7f",
-  },
-  colorway: ["#B22222"],
-  height: 330,
-  margin: { t: 40, b: 80, pad: 5 },
-};
-var humidityLayout = {
-  autosize: true,
-  title: {
-    text: "Humidity",
-  },
-  font: {
-    size: 14,
-    color: "#7f7f7f",
-  },
-  colorway: ["#00008B"],
-  height: 330,
-  margin: { t: 40, b: 80, pad: 5 },
-};
-var pressureLayout = {
-  autosize: true,
-  title: {
-    text: "Pressure",
-  },
-  font: {
-    size: 14,
-    color: "#7f7f7f",
-  },
-  colorway: ["#FF4500"],
-  height: 330,
-  margin: { t: 40, b: 80, pad: 5 },
-};
-var dewPointLayout = {
-  autosize: true,
-  title: {
-    text: "Dew Point",
-  },
-  font: {
-    size: 14,
-    color: "#7f7f7f",
-  },
-  colorway: ["#008080"],
-  height: 330,
-  margin: { t: 40, b: 80, pad: 5 },
-};
+        var temperatureTrace = {
+            x: timeStampArray,
+            y: temperatureArray,
+            name: "Temperature",
+            mode: "lines+markers",
+            type: "scatter",
+        };
+        var humidityTrace = {
+            x: timeStampArray,
+            y: humidityArray,
+            name: "Humidity",
+            mode: "lines+markers",
+            type: "scatter",
+        };
+        var pressureTrace = {
+            x: timeStampArray,
+            y: pressureArray,
+            name: "Pressure",
+            mode: "lines+markers",
+            type: "scatter",
+        };
+        var dewPointTrace = {
+            x: timeStampArray,
+            y: dewPointArray,
+            name: "Dew Point",
+            mode: "lines+markers",
+            type: "scatter",
+        };
 
-Plotly.newPlot(temperatureHistoryDiv, [temperatureTrace], temperatureLayout);
-Plotly.newPlot(humidityHistoryDiv, [humidityTrace], humidityLayout);
-Plotly.newPlot(pressureHistoryDiv, [pressureTrace], pressureLayout);
-Plotly.newPlot(dewPointHistoryDiv, [dewPointTrace], dewPointLayout);
+        var temperatureLayout = {
+            autosize: true,
+            title: {
+                text: "Temperature",
+            },
+            font: {
+                size: 14,
+                color: "#7f7f7f",
+            },
+            colorway: ["#B22222"],
+            height: 330,
+            margin: { t: 40, b: 80, pad: 5 },
+        };
+        var humidityLayout = {
+            autosize: true,
+            title: {
+                text: "Humidity",
+            },
+            font: {
+                size: 14,
+                color: "#7f7f7f",
+            },
+            colorway: ["#00008B"],
+            height: 330,
+            margin: { t: 40, b: 80, pad: 5 },
+        };
+        var pressureLayout = {
+            autosize: true,
+            title: {
+                text: "Pressure",
+            },
+            font: {
+                size: 14,
+                color: "#7f7f7f",
+            },
+            colorway: ["#FF4500"],
+            height: 330,
+            margin: { t: 40, b: 80, pad: 5 },
+        };
+        var dewPointLayout = {
+            autosize: true,
+            title: {
+                text: "Dew Point",
+            },
+            font: {
+                size: 14,
+                color: "#7f7f7f",
+            },
+            colorway: ["#008080"],
+            height: 330,
+            margin: { t: 40, b: 80, pad: 5 },
+        };
 
+        Plotly.newPlot(temperatureHistoryDiv, [temperatureTrace], temperatureLayout);
+        Plotly.newPlot(humidityHistoryDiv, [humidityTrace], humidityLayout);
+        Plotly.newPlot(pressureHistoryDiv, [pressureTrace], pressureLayout);
+        Plotly.newPlot(dewPointHistoryDiv, [dewPointTrace], dewPointLayout);
+    });
 // Gauge Data
 var temperatureData = [
   {
@@ -211,7 +226,7 @@ let newDewPointXArray = [];
 let newDewPointYArray = [];
 
 // The maximum number of data points displayed on our scatter/line graph
-let MAX_GRAPH_POINTS = 256;
+let MAX_GRAPH_POINTS = 65536;
 let ctr = 0;
 
 // Callback function that will retrieve our latest sensor readings and redraw our Gauge with the latest readings
@@ -230,37 +245,34 @@ function updateSensorReadings() {
       updateGauge(temperature, humidity, pressure, dewPoint);
 
       // Update Temperature Line Chart
+       timeStampArray.push(timeStamp);
       updateCharts(
         temperatureHistoryDiv,
-        newTempXArray,
-        newTempYArray,
+        timeStampArray,
+        temperatureArray,
         temperature,
-        timeStamp
       );
       // Update Humidity Line Chart
       updateCharts(
         humidityHistoryDiv,
-        newHumidityXArray,
-        newHumidityYArray,
+        timeStampArray,
+        humidityArray,
         humidity,
-        timeStamp
       );
       // Update Pressure Line Chart
       updateCharts(
         pressureHistoryDiv,
-        newPressureXArray,
-        newPressureYArray,
+        timeStampArray,
+        pressureArray,
         pressure,
-        timeStamp
       );
 
       // Update dewPoint Line Chart
       updateCharts(
         dewPointHistoryDiv,
-        newDewPointXArray,
-        newDewPointYArray,
+        timeStampArray,
+        dewPointArray,
         dewPoint,
-        timeStamp
       );
     });
 }
@@ -296,14 +308,13 @@ function updateGauge(temperature, humidity, pressure, dewPoint) {
   Plotly.update(dewPointGaugeDiv, dewPoint_update);
 }
 
-function updateCharts(lineChartDiv, xArray, yArray, sensorRead, timeStamp) {
+function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {
   if (xArray.length >= MAX_GRAPH_POINTS) {
     xArray.shift();
   }
   if (yArray.length >= MAX_GRAPH_POINTS) {
     yArray.shift();
   }
-  xArray.push(timeStamp);
   yArray.push(sensorRead);
 
   var data_update = {
