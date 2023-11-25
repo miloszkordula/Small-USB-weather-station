@@ -6,7 +6,7 @@
 int Server::createServer() {
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = INADDR_ANY;
-    serverAddress.sin_port = htons(80);
+    serverAddress.sin_port = htons(7777);
     
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != NO_ERROR)
@@ -109,6 +109,7 @@ int Server::handleClient(const char* comPort) {
         json["pressure"] = sensor.getPressure();
         json["dewPoint"] = sensor.getDewPoint();
         json["humidity"] = sensor.getHumidity();
+        json["timeStamp"] = sensor.getTime();
 
         // Serialize the JSON document to a string
         char jsonResponse[256] = "";

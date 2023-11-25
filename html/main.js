@@ -39,7 +39,7 @@ var dewPointTrace = {
 };
 
 var temperatureLayout = {
-  autosize: false,
+  autosize: true,
   title: {
     text: "Temperature",
   },
@@ -48,12 +48,11 @@ var temperatureLayout = {
     color: "#7f7f7f",
   },
   colorway: ["#B22222"],
-  width: 450,
-  height: 260,
-  margin: { t: 30, b: 20, pad: 5 },
+  height: 330,
+  margin: { t: 40, b: 80, pad: 5 },
 };
 var humidityLayout = {
-  autosize: false,
+  autosize: true,
   title: {
     text: "Humidity",
   },
@@ -62,12 +61,11 @@ var humidityLayout = {
     color: "#7f7f7f",
   },
   colorway: ["#00008B"],
-  width: 450,
-  height: 260,
-  margin: { t: 30, b: 20, pad: 5 },
+  height: 330,
+  margin: { t: 40, b: 80, pad: 5 },
 };
 var pressureLayout = {
-  autosize: false,
+  autosize: true,
   title: {
     text: "Pressure",
   },
@@ -76,12 +74,11 @@ var pressureLayout = {
     color: "#7f7f7f",
   },
   colorway: ["#FF4500"],
-  width: 450,
-  height: 260,
-  margin: { t: 30, b: 20, pad: 5 },
+  height: 330,
+  margin: { t: 40, b: 80, pad: 5 },
 };
 var dewPointLayout = {
-  autosize: false,
+  autosize: true,
   title: {
     text: "Dew Point",
   },
@@ -90,9 +87,8 @@ var dewPointLayout = {
     color: "#7f7f7f",
   },
   colorway: ["#008080"],
-  width: 450,
-  height: 260,
-  margin: { t: 30, b: 20, pad: 5 },
+  height: 330,
+  margin: { t: 40, b: 80, pad: 5 },
 };
 
 Plotly.newPlot(temperatureHistoryDiv, [temperatureTrace], temperatureLayout);
@@ -193,7 +189,7 @@ var dewPointData = [
   },
 ];
 
-var layout = { width: 300, height: 250, margin: { t: 0, b: 0, l: 0, r: 0 } };
+var layout = { width: 200, height: 180, margin: { t: 25, b: 0, l: 0, r: 0 } };
 
 Plotly.newPlot(temperatureGaugeDiv, temperatureData, layout);
 Plotly.newPlot(humidityGaugeDiv, humidityData, layout);
@@ -215,7 +211,7 @@ let newDewPointXArray = [];
 let newDewPointYArray = [];
 
 // The maximum number of data points displayed on our scatter/line graph
-let MAX_GRAPH_POINTS = 12;
+let MAX_GRAPH_POINTS = 256;
 let ctr = 0;
 
 // Callback function that will retrieve our latest sensor readings and redraw our Gauge with the latest readings
@@ -227,6 +223,7 @@ function updateSensorReadings() {
       let humidity = jsonResponse.humidity.toFixed(2);
       let pressure = jsonResponse.pressure.toFixed(2);
       let dewPoint = jsonResponse.dewPoint.toFixed(2);
+      let timeStamp = jsonResponse.timeStamp;
 
       updateBoxes(temperature, humidity, pressure, dewPoint);
 
@@ -237,21 +234,24 @@ function updateSensorReadings() {
         temperatureHistoryDiv,
         newTempXArray,
         newTempYArray,
-        temperature
+        temperature,
+        timeStamp
       );
       // Update Humidity Line Chart
       updateCharts(
         humidityHistoryDiv,
         newHumidityXArray,
         newHumidityYArray,
-        humidity
+        humidity,
+        timeStamp
       );
       // Update Pressure Line Chart
       updateCharts(
         pressureHistoryDiv,
         newPressureXArray,
         newPressureYArray,
-        pressure
+        pressure,
+        timeStamp
       );
 
       // Update dewPoint Line Chart
@@ -259,7 +259,8 @@ function updateSensorReadings() {
         dewPointHistoryDiv,
         newDewPointXArray,
         newDewPointYArray,
-        dewPoint
+        dewPoint,
+        timeStamp
       );
     });
 }
@@ -295,14 +296,14 @@ function updateGauge(temperature, humidity, pressure, dewPoint) {
   Plotly.update(dewPointGaugeDiv, dewPoint_update);
 }
 
-function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {
+function updateCharts(lineChartDiv, xArray, yArray, sensorRead, timeStamp) {
   if (xArray.length >= MAX_GRAPH_POINTS) {
     xArray.shift();
   }
   if (yArray.length >= MAX_GRAPH_POINTS) {
     yArray.shift();
   }
-  xArray.push(ctr++);
+  xArray.push(timeStamp);
   yArray.push(sensorRead);
 
   var data_update = {
