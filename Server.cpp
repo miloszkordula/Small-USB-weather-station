@@ -142,6 +142,64 @@ int Server::handleClient(const char* comPort) {
             send(clientSocket, response.c_str(), response.length(), 0);
         }
     }
+    else if (request.find("GET /calibration.html") != std::string::npos) {
+        std::ifstream file("./html/calibration.html");
+        if (file.is_open()) {
+            std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: "
+                + std::to_string(content.length()) + "\r\n\r\n" + content;
+            send(clientSocket, response.c_str(), response.length(), 0);
+        }
+        else {
+            std::string response = "HTTP/1.1 404 Not Found\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>";
+            send(clientSocket, response.c_str(), response.length(), 0);
+        }
+    }
+    else if (request.find("GET /calibration.js") != std::string::npos) {
+        std::ifstream file("./html/calibraion.js");
+        printf("cal js\n");
+        if (file.is_open()) {
+            std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/javascript\r\nContent-Length: "
+                + std::to_string(content.length()) + "\r\n\r\n" + content;
+            send(clientSocket, response.c_str(), response.length(), 0);
+        }
+        else {
+            std::string response = "HTTP/1.1 404 Not Found\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>";
+            send(clientSocket, response.c_str(), response.length(), 0);
+        }
+    }
+    else if (request.find("POST /calibration.html") != std::string::npos) {
+        // Assuming the data is sent as form-urlencoded in the request body
+        std::string requestBody = request.substr(request.find("\r\n\r\n") + 4);
+
+        // Extracting input1 and input2 values from the request body
+        std::string input1Value;
+        std::string input2Value;
+
+        size_t pos = 0;
+        while ((pos = requestBody.find("&")) != std::string::npos) {
+            std::string token = requestBody.substr(0, pos);
+            size_t eqPos = token.find("=");
+            std::string key = token.substr(0, eqPos);
+            std::string value = token.substr(eqPos + 1);
+
+            if (key == "temp-a") {
+                input1Value = value;
+            }
+            else if (key == "temp-b") {
+                input2Value = value;
+            }
+
+            requestBody.erase(0, pos + 1);
+        }
+
+        std::cout << "Input 1: " << input1Value << std::endl;
+        std::cout << "Input 2: " << input2Value << std::endl;
+
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Received inputs successfully</h1></body></html>";
+        send(clientSocket, response.c_str(), response.length(), 0);
+    }
     else {
         std::string response = "HTTP/1.1 404 Not Found\r\n\r\n<html><body><h1>404 Not Found</h1></body></html>";
         send(clientSocket, response.c_str(), response.length(), 0);

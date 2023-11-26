@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>USB weather station</title>
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+  </head>
+  <body>
+    <div class="sidebar">
+      <ul class="nav-links">
+        <li>
+          <a href="#" class="active">
+            <i class="bx bx-grid-alt"></i>
+            <span class="links_name">Dashboard</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <section class="home-section">
+      <nav>
+        <div class="sidebar-button">
+          <i class="bx bx-menu sidebarBtn"></i>
+          <span class="dashboard">USB BME280 Weather Station Dashboard</span>
+        </div>
+      </nav>
+      <div class="home-content">
+        <div class="overview-boxes">
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Temperature</div>
+              <div class="number" id="temperature"></div>
+            </div>
+            <i class="bx bxs-thermometer readings"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Humidity</div>
+              <div class="number" id="humidity"></div>
+            </div>
+            <i class="bx bxs-droplet-half readings two"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Pressure</div>
+              <div class="number" id="pressure"></div>
+            </div>
+            <i class="bx bxs-tachometer readings three"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Dew Point</div>
+              <div class="number" id="dewPoint"></div>
+            </div>
+            <i class="bx bxs-droplet readings four"></i>
+          </div>
+        </div>
+        <div class="graph-box">
+            <div class="history-charts">
+                <div class="title">Calibration</div>
+                <div class="title">calibratedReading = a * originalReading +b </div>
+                <div class="history-details">
+                    <div class="history-col-item">
+                        <div id="temperature-input" class="history-divs">
+                            <label for="temp-a">Temperature a:</label>
+                            <input type="number" id="temp-a" name="temp-a"><br><br>
+
+                            <label for="input2">Temperature b</label>
+                            <input type="number" id="temp-b" name="temp-b"><br><br>
+
+                            <input type="submit" value="Submit">
+                        </div>
+                        <div id="humidity-input" class="history-divs"></div>
+                    </div>
+                    <div class="history-col-item">
+                        <div id="pressure-input" class="history-divs"></div>
+                        <div id="dewPoint-input" class="history-divs"></div>
+                    </div>
+                </div>
+            </div>
+          <div class="gaugeCharts">
+            <div class="title">Gauge Charts</div>
+            <div class="gauge-list">
+              <div class="gauge-box"><div id="temperature-gauge"></div></div>
+              <div class="gauge-box"><div id="humidity-gauge"></div></div>
+              <div class="gauge-box"><div id="pressure-gauge"></div></div>
+              <div class="gauge-box"><div id="dewPoint-gauge"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="calibration.js"></script>
+  </body>
+</html>

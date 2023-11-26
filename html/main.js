@@ -211,20 +211,6 @@ Plotly.newPlot(humidityGaugeDiv, humidityData, layout);
 Plotly.newPlot(pressureGaugeDiv, pressureData, layout);
 Plotly.newPlot(dewPointGaugeDiv, dewPointData, layout);
 
-// Will hold the arrays we receive from our BME280 sensor
-// Temperature
-let newTempXArray = [];
-let newTempYArray = [];
-// Humidity
-let newHumidityXArray = [];
-let newHumidityYArray = [];
-// Pressure
-let newPressureXArray = [];
-let newPressureYArray = [];
-// dewPoint
-let newDewPointXArray = [];
-let newDewPointYArray = [];
-
 // The maximum number of data points displayed on our scatter/line graph
 let MAX_GRAPH_POINTS = 65536;
 let ctr = 0;
@@ -324,6 +310,8 @@ function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {
 
   Plotly.update(lineChartDiv, data_update);
 }
+
+
 
 // Continuos loop that runs evry 3 seconds to update our web page with the latest sensor readings
 (function loop() {

@@ -52,5 +52,11 @@
     <None Include="html\style.css">
       <Filter>html</Filter>
     </None>
+    <None Include="html\calibration.html">
+      <Filter>html</Filter>
+    </None>
+    <None Include="html\calibration.js">
+      <Filter>html</Filter>
+    </None>
   </ItemGroup>
 </Project>
