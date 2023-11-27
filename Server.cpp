@@ -37,6 +37,34 @@ int Server::createServer() {
     printf("server created\n");
     this->mainSocket = mainSocket;
     loadCalibration();
+    std::string filename = "history.json";
+    std::fstream file(filename, std::ios::in | std::ios::out | std::ios::ate);
+
+    if (!file.is_open()) {
+        // If the file doesn't exist, create it and add a line
+        file.open(filename, std::ios::out);
+        file << "[\n";
+        file.close();
+        newHistory = 1;
+    }
+    else {
+        // File exists, checking if it's empty
+        file.seekg(0, std::ios::end);
+        if (file.tellg() == 0) {
+            // File is empty, add a line
+            file.close();
+            file.open(filename, std::ios::out | std::ios::app);
+            file << "[\n";
+            file.close();
+            newHistory = 1;
+        }
+        else {
+            // File is not empty, no need to add a line
+            file.close();
+            std::cout << "History already exists and is not empty.\n";
+        }
+    }
+
     return 0;
 }
 
@@ -227,9 +255,15 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
         std::cout << "Error opening the file!" << std::endl;
         return 1;
     }
-    file << ',' << std::endl << readingsJSON;
-    file.close();
-
+    if (newHistory == 0) {
+        file << ',' << std::endl << readingsJSON;
+        file.close();
+    }
+    else {
+        file << std::endl << readingsJSON;
+        file.close();
+        newHistory = 0;
+    }
     std::cout << "Readings saved" << std::endl;
     return 0;
 }
