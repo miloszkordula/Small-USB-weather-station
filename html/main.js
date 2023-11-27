@@ -113,95 +113,95 @@ fetch(`/history`)
     });
 // Gauge Data
 var temperatureData = [
-  {
-    domain: { x: [0, 1], y: [0, 1] },
-    value: 0,
-    title: { text: "Temperature" },
-    type: "indicator",
-    mode: "gauge+number+delta",
-    delta: { reference: 30 },
-    gauge: {
-        axis: { range: [-10, 40] },
-      steps: [
-        { range: [10, 30], color: "lightgray" },
-        { range: [18, 25], color: "gray" },
-      ],
-      threshold: {
-        line: { color: "red", width: 4 },
-        thickness: 0.75,
-        value: 30,
-      },
+    {
+        domain: { x: [0, 1], y: [0, 1] },
+        value: 0,
+        title: { text: "Temperature" },
+        type: "indicator",
+        mode: "gauge+number+delta",
+        //delta: { reference: 30 },
+        gauge: {
+            axis: { range: [-10, 40] },
+            steps: [
+                { range: [10, 30], color: "lightgray" },
+                { range: [18, 25], color: "gray" },
+            ],
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 30,
+            //},
+        },
     },
-  },
 ];
 
 var humidityData = [
-  {
-    domain: { x: [0, 1], y: [0, 1] },
-    value: 0,
-    title: { text: "Humidity" },
-    type: "indicator",
-    mode: "gauge+number+delta",
-    delta: { reference: 50 },
-    gauge: {
-      axis: { range: [null, 100] },
-      steps: [
-        { range: [20, 80], color: "lightgray" },
-        { range: [40, 60], color: "gray" },
-      ],
-      threshold: {
-        line: { color: "red", width: 4 },
-        thickness: 0.75,
-        value: 20,
-      },
+    {
+        domain: { x: [0, 1], y: [0, 1] },
+        value: 0,
+        title: { text: "Humidity" },
+        type: "indicator",
+        mode: "gauge+number+delta",
+        //delta: { reference: 50 },
+        gauge: {
+            axis: { range: [null, 100] },
+            steps: [
+                { range: [20, 80], color: "lightgray" },
+                { range: [40, 60], color: "gray" },
+            ],
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 20,
+            //},
+        },
     },
-  },
 ];
 
 var pressureData = [
-  {
-    domain: { x: [0, 1], y: [0, 1] },
-    value: 0,
-    title: { text: "Pressure" },
-    type: "indicator",
-    mode: "gauge+number+delta",
-    delta: { reference: 750 },
-    gauge: {
-      axis: { range: [900, 1100] },
-      steps: [
-        { range: [950, 1050], color: "lightgray" },
-        { range: [980, 1020], color: "gray" },
-      ],
-      threshold: {
-        line: { color: "red", width: 4 },
-        thickness: 0.75,
-        value: 1050,
-      },
+    {
+        domain: { x: [0, 1], y: [0, 1] },
+        value: 0,
+        title: { text: "Pressure" },
+        type: "indicator",
+        mode: "gauge+number+delta",
+        //delta: { reference: 750 },
+        gauge: {
+            axis: { range: [900, 1100] },
+            steps: [
+                { range: [950, 1050], color: "lightgray" },
+                { range: [980, 1020], color: "gray" },
+            ],
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 1050,
+            //},
+        },
     },
-  },
 ];
 
 var dewPointData = [
-  {
-    domain: { x: [0, 1], y: [0, 1] },
-    value: 0,
-    title: { text: "Dew Point" },
-    type: "indicator",
-    mode: "gauge+number+delta",
-    delta: { reference: 60 },
-    gauge: {
-      axis: { range: [-20, 30] },
-      steps: [
-        { range: [0, 20], color: "lightgray" },
-        { range: [8, 15], color: "gray" },
-      ],
-      threshold: {
-        line: { color: "red", width: 4 },
-        thickness: 0.75,
+    {
+        domain: { x: [0, 1], y: [0, 1] },
         value: 0,
-      },
+        title: { text: "Dew Point" },
+        type: "indicator",
+        mode: "gauge+number+delta",
+        //  delta: { reference: 60 },
+        gauge: {
+            axis: { range: [-20, 30] },
+            steps: [
+                { range: [0, 20], color: "lightgray" },
+                { range: [8, 15], color: "gray" },
+            ],
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 0,
+            //},
+        },
     },
-  },
 ];
 
 var layout = { width: 200, height: 180, margin: { t: 25, b: 0, l: 0, r: 0 } };

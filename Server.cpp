@@ -36,6 +36,7 @@ int Server::createServer() {
     }
     printf("server created\n");
     this->mainSocket = mainSocket;
+    loadCalibration();
     return 0;
 }
 
@@ -54,7 +55,6 @@ int Server::handleClient(const char* comPort) {
         std::cerr << "Receive failed." << std::endl;
         closesocket(clientSocket);
         return 0;
-       // continue;
     }
 
     std::string request(buffer, bytesRead);
@@ -103,7 +103,7 @@ int Server::handleClient(const char* comPort) {
     else if (request.find("GET /sensorReadings") != std::string::npos) {
         this->sensor.update(comPort);
 
-        DynamicJsonDocument json(1024);
+        DynamicJsonDocument json(256);
         json["status"] = "ok";
         json["temperature"] = sensor.getTemperature();
         json["pressure"] = sensor.getPressure();
@@ -114,9 +114,11 @@ int Server::handleClient(const char* comPort) {
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
         saveReadingsToFile(jsonResponse);
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " 
-            + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
-        send(clientSocket, response.c_str(), response.length(), 0);
+        if (sensor.getTime() != "") {
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
+                + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
+            send(clientSocket, response.c_str(), response.length(), 0);
+        }
     }
     else if (request.find("GET /history") != std::string::npos) {
         std::string file_path = "history.json";
@@ -125,7 +127,6 @@ int Server::handleClient(const char* comPort) {
 
         if (!file.is_open()) {
             std::cout << "Error opening the file!" << std::endl;
-         
         }
         else {
             std::string line;
@@ -156,7 +157,7 @@ int Server::handleClient(const char* comPort) {
         }
     }
     else if (request.find("GET /calibration.js") != std::string::npos) {
-        std::ifstream file("./html/calibraion.js");
+        std::ifstream file("./html/calibration.js");
         printf("cal js\n");
         if (file.is_open()) {
             std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
@@ -169,33 +170,42 @@ int Server::handleClient(const char* comPort) {
             send(clientSocket, response.c_str(), response.length(), 0);
         }
     }
-    else if (request.find("POST /calibration.html") != std::string::npos) {
+    else if (request.find("GET /calibrationValues") != std::string::npos) {
+
+        DynamicJsonDocument json(1024);
+        json["tempA"] = this->sensor.getTempA();
+        json["tempB"] = this->sensor.getTempB();
+        json["humiA"] = this->sensor.getHumiA();
+        json["humiB"] = this->sensor.getHumiB();
+        json["presA"] = this->sensor.getPresA();
+        json["presB"] = this->sensor.getPresB();
+        json["dewpA"] = this->sensor.getDewpA();
+        json["dewpB"] = this->sensor.getDewpB();
+
+        char jsonResponse[1024] = "";
+        serializeJson(json, jsonResponse);
+        //saveReadingsToFile(jsonResponse);
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
+            + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
+        send(clientSocket, response.c_str(), response.length(), 0);
+        }
+    else if (request.find("POST /submitValues") != std::string::npos) {
         // Assuming the data is sent as form-urlencoded in the request body
         std::string requestBody = request.substr(request.find("\r\n\r\n") + 4);
 
         // Extracting input1 and input2 values from the request body
-        std::string input1Value;
-        std::string input2Value;
+        StaticJsonDocument<1024> doc;
+        DeserializationError error = deserializeJson(doc, requestBody);
 
-        size_t pos = 0;
-        while ((pos = requestBody.find("&")) != std::string::npos) {
-            std::string token = requestBody.substr(0, pos);
-            size_t eqPos = token.find("=");
-            std::string key = token.substr(0, eqPos);
-            std::string value = token.substr(eqPos + 1);
-
-            if (key == "temp-a") {
-                input1Value = value;
-            }
-            else if (key == "temp-b") {
-                input2Value = value;
-            }
-
-            requestBody.erase(0, pos + 1);
+        if (error) {
+            std::cout << "Error recieving values\n";
+            return 0;
         }
 
-        std::cout << "Input 1: " << input1Value << std::endl;
-        std::cout << "Input 2: " << input2Value << std::endl;
+        this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
+            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"] );
+        std::cout << "Calibration done\n";
+        this->sensor.saveCalibration(requestBody);
 
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Received inputs successfully</h1></body></html>";
         send(clientSocket, response.c_str(), response.length(), 0);
@@ -222,4 +232,32 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
 
     std::cout << "Readings saved" << std::endl;
     return 0;
+}
+
+void Server::loadCalibration() {
+    std::string file_path = "config.cfg";
+    std::ifstream file(file_path);
+    std::string fileContent, line;
+
+    if (file.is_open()) {
+        while (std::getline(file, line)) {
+            fileContent += line;
+            fileContent += '\n';
+        }
+        file.close();
+    }
+    else {
+        std::cerr << "Unable to open file: " << file_path << std::endl;
+    }
+    StaticJsonDocument<1024> doc;
+    DeserializationError error = deserializeJson(doc, fileContent);
+
+    if (error) {
+        std::cout << "Error recieving values\n";
+    }
+    else {
+       this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
+            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"]);
+       std::cout << "Calibration loaded\n";
+    }
 }

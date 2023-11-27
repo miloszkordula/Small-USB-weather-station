@@ -1,8 +1,3 @@
-var temperatureHistoryDiv = document.getElementById("temperature-history");
-var humidityHistoryDiv = document.getElementById("humidity-history");
-var pressureHistoryDiv = document.getElementById("pressure-history");
-var dewPointHistoryDiv = document.getElementById("dewPoint-history");
-
 var temperatureGaugeDiv = document.getElementById("temperature-gauge");
 var humidityGaugeDiv = document.getElementById("humidity-gauge");
 var pressureGaugeDiv = document.getElementById("pressure-gauge");
@@ -15,20 +10,60 @@ let dewPointArray = [];
 let timeStampArray = [];
 
 fetch('/calibrationValues')
-    .then(data => {
+    .then((response) => response.json())
+    .then((jsonResponse) => {
     // Set default values in input boxes
-    document.getElementById('temp-a').value = data.temp-a;
-    document.getElementById('temp-b').value = data.temp-b;
+        document.getElementById('temp-a').value = jsonResponse.tempA;
+        document.getElementById('temp-b').value = jsonResponse.tempB;
+
+        document.getElementById('humi-a').value = jsonResponse.humiA;
+        document.getElementById('humi-b').value = jsonResponse.humiB;
+
+        document.getElementById('pres-a').value = jsonResponse.presA;
+        document.getElementById('pres-b').value = jsonResponse.presB;
+
+        document.getElementById('dewp-a').value = jsonResponse.dewpA;
+        document.getElementById('dewp-b').value = jsonResponse.dewpB;
 }).catch(error => {
     console.error('Error fetching default values:', error);
 });
 
-document.getElementById('inputForm').addEventListener('submit', function (event) {
+document.getElementById('calibration-input').addEventListener('submit', function (event) {
     event.preventDefault(); // Prevent default form submission behavior
 
     // Retrieve values from input boxes
-    let inputValue1 = document.getElementById('temp-a').value;
-    let inputValue2 = document.getElementById('temp-b').value;
+    let tempA = document.getElementById('temp-a').value;
+    let tempB = document.getElementById('temp-b').value;
+
+    let humiA = document.getElementById('humi-a').value;
+    let humiB = document.getElementById('humi-b').value;
+
+    let presA = document.getElementById('pres-a').value;
+    let presB = document.getElementById('pres-b').value;
+
+    let dewpA = document.getElementById('dewp-a').value;
+    let dewpB = document.getElementById('dewp-b').value;
+
+        fetch('/submitValues', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            tempA: tempA,
+            tempB: tempB,
+            humiA: humiA,
+            humiB: humiB,
+            presA: presA,
+            presB: presB,
+            dewpA: dewpA,
+            dewpB: dewpB
+        })
+    }).then(response => {
+        // Handle the response from the backend if required
+    }).catch(error => {
+        console.error('Error submitting values:', error);
+    });
 
 });
 
@@ -123,11 +158,6 @@ fetch(`/history`)
             height: 330,
             margin: { t: 40, b: 80, pad: 5 },
         };
-
-        Plotly.newPlot(temperatureHistoryDiv, [temperatureTrace], temperatureLayout);
-        Plotly.newPlot(humidityHistoryDiv, [humidityTrace], humidityLayout);
-        Plotly.newPlot(pressureHistoryDiv, [pressureTrace], pressureLayout);
-        Plotly.newPlot(dewPointHistoryDiv, [dewPointTrace], dewPointLayout);
     });
 // Gauge Data
 var temperatureData = [
@@ -137,18 +167,18 @@ var temperatureData = [
         title: { text: "Temperature" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 30 },
+        //delta: { reference: 30 },
         gauge: {
             axis: { range: [-10, 40] },
             steps: [
                 { range: [10, 30], color: "lightgray" },
                 { range: [18, 25], color: "gray" },
             ],
-            threshold: {
-                line: { color: "red", width: 4 },
-                thickness: 0.75,
-                value: 30,
-            },
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 30,
+            //},
         },
     },
 ];
@@ -160,18 +190,18 @@ var humidityData = [
         title: { text: "Humidity" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 50 },
+        //delta: { reference: 50 },
         gauge: {
             axis: { range: [null, 100] },
             steps: [
                 { range: [20, 80], color: "lightgray" },
                 { range: [40, 60], color: "gray" },
             ],
-            threshold: {
-                line: { color: "red", width: 4 },
-                thickness: 0.75,
-                value: 20,
-            },
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 20,
+            //},
         },
     },
 ];
@@ -183,18 +213,18 @@ var pressureData = [
         title: { text: "Pressure" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 750 },
+        //delta: { reference: 750 },
         gauge: {
             axis: { range: [900, 1100] },
             steps: [
                 { range: [950, 1050], color: "lightgray" },
                 { range: [980, 1020], color: "gray" },
             ],
-            threshold: {
-                line: { color: "red", width: 4 },
-                thickness: 0.75,
-                value: 1050,
-            },
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 1050,
+            //},
         },
     },
 ];
@@ -206,18 +236,18 @@ var dewPointData = [
         title: { text: "Dew Point" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 60 },
+      //  delta: { reference: 60 },
         gauge: {
             axis: { range: [-20, 30] },
             steps: [
                 { range: [0, 20], color: "lightgray" },
                 { range: [8, 15], color: "gray" },
             ],
-            threshold: {
-                line: { color: "red", width: 4 },
-                thickness: 0.75,
-                value: 0,
-            },
+            //threshold: {
+            //    line: { color: "red", width: 4 },
+            //    thickness: 0.75,
+            //    value: 0,
+            //},
         },
     },
 ];
@@ -249,35 +279,35 @@ function updateSensorReadings() {
             updateGauge(temperature, humidity, pressure, dewPoint);
 
             // Update Temperature Line Chart
-            timeStampArray.push(timeStamp);
-            updateCharts(
-                temperatureHistoryDiv,
-                timeStampArray,
-                temperatureArray,
-                temperature,
-            );
-            // Update Humidity Line Chart
-            updateCharts(
-                humidityHistoryDiv,
-                timeStampArray,
-                humidityArray,
-                humidity,
-            );
-            // Update Pressure Line Chart
-            updateCharts(
-                pressureHistoryDiv,
-                timeStampArray,
-                pressureArray,
-                pressure,
-            );
+            //timeStampArray.push(timeStamp);
+            //updateCharts(
+            //    temperatureHistoryDiv,
+            //    timeStampArray,
+            //    temperatureArray,
+            //    temperature,
+            //);
+            //// Update Humidity Line Chart
+            //updateCharts(
+            //    humidityHistoryDiv,
+            //    timeStampArray,
+            //    humidityArray,
+            //    humidity,
+            //);
+            //// Update Pressure Line Chart
+            //updateCharts(
+            //    pressureHistoryDiv,
+            //    timeStampArray,
+            //    pressureArray,
+            //    pressure,
+            //);
 
-            // Update dewPoint Line Chart
-            updateCharts(
-                dewPointHistoryDiv,
-                timeStampArray,
-                dewPointArray,
-                dewPoint,
-            );
+            //// Update dewPoint Line Chart
+            //updateCharts(
+            //    dewPointHistoryDiv,
+            //    timeStampArray,
+            //    dewPointArray,
+            //    dewPoint,
+            //);
         });
 }
 
@@ -312,22 +342,22 @@ function updateGauge(temperature, humidity, pressure, dewPoint) {
     Plotly.update(dewPointGaugeDiv, dewPoint_update);
 }
 
-function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {
-    if (xArray.length >= MAX_GRAPH_POINTS) {
-        xArray.shift();
-    }
-    if (yArray.length >= MAX_GRAPH_POINTS) {
-        yArray.shift();
-    }
-    yArray.push(sensorRead);
+//function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {
+//    if (xArray.length >= MAX_GRAPH_POINTS) {
+//        xArray.shift();
+//    }
+//    if (yArray.length >= MAX_GRAPH_POINTS) {
+//        yArray.shift();
+//    }
+//    yArray.push(sensorRead);
 
-    var data_update = {
-        x: [xArray],
-        y: [yArray],
-    };
+//    var data_update = {
+//        x: [xArray],
+//        y: [yArray],
+//    };
 
-    Plotly.update(lineChartDiv, data_update);
-}
+//    Plotly.update(lineChartDiv, data_update);
+//}
 
 
 

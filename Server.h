@@ -13,6 +13,6 @@ public:
 	int createServer();
 	int handleClient(const char* comPort);
 	int saveReadingsToFile(char readingsJSON[256]);
-
+	void loadCalibration();
 };
 

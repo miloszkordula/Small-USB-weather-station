@@ -2,6 +2,9 @@
 #include "lib/serialib.h"
 #include <chrono>
 #include <iomanip>
+#include <fstream>
+#include <iostream>
+#include <ArduinoJson.h>
 
 int Sensor::update(const char* comPort) {
     serialib serial;
@@ -47,21 +50,96 @@ int Sensor::update(const char* comPort) {
 }
 
 double Sensor::getTemperature() {
-    return this->temperature;
+    return ((this->temperature) + 273.15) * this->tempA + this->tempB - 273.15;
 }
 
 double Sensor::getPressure() {
-    return this->pressure;
+    return this->pressure * this->presA + this->presB;
 }
 
 double Sensor::getHumidity() {
-    return this->humidity;
+    return this->humidity * this->humiA + this->humiB;
 }
 
 double Sensor::getDewPoint() {
-    return this->dewPoint;
+    return ((this->dewPoint) + 273.15) * this->dewpA + this->dewpB - 273.15;
 }
 
 std::string Sensor::getTime() {
     return this->time;
 }
+
+double Sensor::getTempA() {
+    return this->tempA;
+}
+
+double Sensor::getTempB() {
+    return this->tempB;
+}
+
+double Sensor::getHumiA() {
+    return this->humiA;
+}
+
+double Sensor::getHumiB() {
+    return this->humiB;
+}
+
+double Sensor::getPresA() {
+    return this->presA;
+}
+
+double Sensor::getPresB() {
+    return this->presB;
+}
+
+double Sensor::getDewpA() {
+    return this->dewpA;
+}
+
+double Sensor::getDewpB() {
+    return this->dewpB;
+}
+
+void Sensor::setCalibration(double tempA, double tempB, double humiA,
+    double humiB, double presA, double presB, double dewpA, double dewpB) {
+    if (tempA <= 0) tempA = 1;
+    if (humiA <= 0) humiA = 1;
+    if (presA <= 0) presA = 1;
+    if (dewpA <= 0) dewpA = 1;
+    this->tempA = tempA;
+    this->tempB = tempB;
+    this->humiA = humiA;
+    this->humiB = humiB;
+    this->presA = presA;
+    this->dewpB = presB;
+    this->dewpA = dewpA;
+    this->dewpB = dewpB;
+}
+
+void Sensor::restoreCalibration() {
+    this->tempA = 1;
+    this->tempB = -4;
+    this->humiA = 1;
+    this->humiB = 0;
+    this->presA = 1;
+    this->presB = 0;
+    this->dewpA = 1;
+    this->dewpB = 0;
+}
+
+void Sensor::saveCalibration(std::string calibration) {
+    std::string file_path = "config.cfg";
+    std::ofstream file;
+
+    file.open(file_path, std::ios::trunc);
+    if (file.is_open()) {
+        file << calibration; // Write string data to the file
+        file.close(); // Close the file
+        std::cout << "Data written to file successfully." << std::endl;
+    }
+    else {
+        std::cerr << "Unable to open file: " << file_path << std::endl;
+    }
+}
+

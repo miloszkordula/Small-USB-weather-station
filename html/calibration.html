@@ -15,12 +15,16 @@
   <body>
     <div class="sidebar">
       <ul class="nav-links">
-        <li>
-          <a href="#" class="active">
-            <i class="bx bx-grid-alt"></i>
-            <span class="links_name">Dashboard</span>
-          </a>
-        </li>
+          <li>
+              <a href="index.html" class="active">
+                  <i class="bx bx-grid-alt"></i>
+                  <span class="links_name">Dashboard</span>
+              </a>
+              <a href="calibration.html" class="active">
+                  <i class="bx bx-grid-alt"></i>
+                  <span class="links_name">Calibration</span>
+              </a>
+          </li>
       </ul>
     </div>
     <section class="home-section">
@@ -62,28 +66,41 @@
           </div>
         </div>
         <div class="graph-box">
-            <div class="history-charts">
+            <form id="calibration-input"class="history-charts">
                 <div class="title">Calibration</div>
-                <div class="title">calibratedReading = a * originalReading +b </div>
+                <div class="formula">calibratedReading = a * originalReading + b </div>
+                <input type="submit" value="Submit">
                 <div class="history-details">
                     <div class="history-col-item">
-                        <div id="temperature-input" class="history-divs">
+                        <div id="temperature-input" class="calibration-forms">
                             <label for="temp-a">Temperature a:</label>
                             <input type="number" id="temp-a" name="temp-a"><br><br>
-
-                            <label for="input2">Temperature b</label>
+                            <label for="temp-b">Temperature b:</label>
                             <input type="number" id="temp-b" name="temp-b"><br><br>
-
-                            <input type="submit" value="Submit">
                         </div>
-                        <div id="humidity-input" class="history-divs"></div>
+                        <div id="humidity-input" class="calibration-forms">
+                            <label for="temp-a">Humidity a:</label>
+                            <input type="number" id="humi-a" name="humi-a"><br><br>
+                            <label for="humi-b">Humidity b:</label>
+                            <input type="number" id="humi-b" name="humi-b"><br><br>
+                        </div>
                     </div>
                     <div class="history-col-item">
-                        <div id="pressure-input" class="history-divs"></div>
-                        <div id="dewPoint-input" class="history-divs"></div>
+                        <div id="pressure-input" class="calibration-forms">
+                            <label for="pres-a">Pressure a:</label>
+                            <input type="number" id="pres-a" name="pres-a"><br><br>
+                            <label for="pres-b">Pressure b:</label>
+                            <input type="number" id="pres-b" name="pres-b"><br><br>
+                        </div>
+                        <div id="dewPoint-input" class="calibration-forms">
+                            <label for="depw-a">Dew Point a:</label>
+                            <input type="number" id="dewp-a" name="dewp-a"><br><br>
+                            <label for="dewp-b">Dew Point b:</label>
+                            <input type="number" id="dewp-b" name="dewp-b"><br><br>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
           <div class="gaugeCharts">
             <div class="title">Gauge Charts</div>
             <div class="gauge-list">
