@@ -12,7 +12,6 @@ int Sensor::update(const char* comPort) {
         printf("Error connecting to %s %i\n",comPort, (int)errorOpening);
         return errorOpening;
     }
-    printf("Successful connection to %s\n", comPort);
 
     char buffer[128] = "";
     Sensor sensor;
@@ -135,7 +134,7 @@ void Sensor::saveCalibration(std::string calibration) {
     if (file.is_open()) {
         file << calibration; // Write string data to the file
         file.close(); // Close the file
-        std::cout << "Data written to file successfully." << std::endl;
+        std::cout << "Calibration written to file successfully." << std::endl;
     }
     else {
         std::cerr << "Unable to open file: " << file_path << std::endl;
