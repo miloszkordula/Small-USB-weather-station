@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <fstream>
 #include <iostream>
+#include <ArduinoJson.h>
 
 int Sensor::update(const char* comPort) {
     serialib serial;

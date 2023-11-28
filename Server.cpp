@@ -37,6 +37,7 @@ int Server::createServer() {
     printf("server created\n");
     this->mainSocket = mainSocket;
     loadCalibration();
+<<<<<<< HEAD
     std::string filename = "history.json";
     std::fstream file(filename, std::ios::in | std::ios::out | std::ios::ate);
 
@@ -61,6 +62,8 @@ int Server::createServer() {
         }
     }
 
+=======
+>>>>>>> parent of 98191b9 (Added better history file handling and temperature tendency)
     return 0;
 }
 
@@ -246,6 +249,7 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
         std::cout << "Error opening the file!" << std::endl;
         return 1;
     }
+<<<<<<< HEAD
     if (newHistory == 0) {
         file << ',' << std::endl << readingsJSON;
         file.close();
@@ -255,6 +259,12 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
         file.close();
         newHistory = 0;
     }
+=======
+    file << ',' << std::endl << readingsJSON;
+    file.close();
+
+    std::cout << "Readings saved" << std::endl;
+>>>>>>> parent of 98191b9 (Added better history file handling and temperature tendency)
     return 0;
 }
 

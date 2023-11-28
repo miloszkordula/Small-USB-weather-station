@@ -9,7 +9,6 @@ class Server
     sockaddr_in serverAddress;
 	SOCKET mainSocket;
 	Sensor sensor;
-	int newHistory = 0;
 public:
 	int createServer();
 	int handleClient(const char* comPort, Sensor sensor);

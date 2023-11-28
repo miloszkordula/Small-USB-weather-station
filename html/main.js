@@ -111,30 +111,6 @@ fetch(`/history`)
         Plotly.newPlot(pressureHistoryDiv, [pressureTrace], pressureLayout);
         Plotly.newPlot(dewPointHistoryDiv, [dewPointTrace], dewPointLayout);
     });
-
-
-
-function findClosestReading() {
-    const currentTime = new Date();
-    let referenceTime = new Date(currentTime.getTime() - (1 * 60 * 60 * 1000));
-
-    const targetDate = new Date(referenceTime);
-    let closestIndex = 0;
-    let closestDiff = Math.abs(targetDate - new Date(timeStampArray[0]));
-
-    for (let i = 1; i < timeStampArray.length; i++) {
-        const currentDiff = Math.abs(targetDate - new Date(timeStampArray[i]));
-        if (currentDiff < closestDiff) {
-            closestDiff = currentDiff;
-            closestIndex = i;
-        }
-    }
-
-    console.error('Error submitting values:', closestIndex);
-    return closestIndex;
-}
-
-
 // Gauge Data
 var temperatureData = [
     {
@@ -143,7 +119,7 @@ var temperatureData = [
         title: { text: "Temperature" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 0 },
+        //delta: { reference: 30 },
         gauge: {
             axis: { range: [-10, 40] },
             steps: [
@@ -166,7 +142,7 @@ var humidityData = [
         title: { text: "Humidity" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 0 },
+        //delta: { reference: 50 },
         gauge: {
             axis: { range: [null, 100] },
             steps: [
@@ -189,7 +165,7 @@ var pressureData = [
         title: { text: "Pressure" },
         type: "indicator",
         mode: "gauge+number+delta",
-       delta: { reference: 0 },
+        //delta: { reference: 750 },
         gauge: {
             axis: { range: [900, 1100] },
             steps: [
@@ -212,7 +188,7 @@ var dewPointData = [
         title: { text: "Dew Point" },
         type: "indicator",
         mode: "gauge+number+delta",
-        delta: { reference: 0 },
+        //  delta: { reference: 60 },
         gauge: {
             axis: { range: [-20, 30] },
             steps: [
@@ -300,23 +276,17 @@ function updateBoxes(temperature, humidity, pressure, dewPoint) {
 }
 
 function updateGauge(temperature, humidity, pressure, dewPoint) {
-    const referenceReadings = findClosestReading();
-    var temperature_update = {
-        value: temperature,
-        delta: { reference: temperatureArray[referenceReadings] },
-
+  var temperature_update = {
+    value: temperature,
   };
   var humidity_update = {
-      value: humidity,
-      delta: { reference: humidityArray[referenceReadings] },
+    value: humidity,
   };
   var pressure_update = {
-      value: pressure,
-      delta: { reference: pressureArray[referenceReadings] },
+    value: pressure,
   };
     var dewPoint_update = {
-        value: dewPoint,
-        delta: { reference: dewPointArray[referenceReadings] },
+    value: dewPoint,
   };
   Plotly.update(temperatureGaugeDiv, temperature_update);
   Plotly.update(humidityGaugeDiv, humidity_update);
