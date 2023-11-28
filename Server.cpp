@@ -64,7 +64,8 @@ int Server::createServer() {
     return 0;
 }
 
-int Server::handleClient(const char* comPort) {
+int Server::handleClient(const char* comPort, Sensor s) {
+    this->sensor = s;
     SOCKET clientSocket = accept(mainSocket, NULL, NULL);
     if (clientSocket == INVALID_SOCKET) {
         std::cerr << "Accept failed." << std::endl;
@@ -285,7 +286,7 @@ void Server::loadCalibration() {
     }
 }
 
-void Server::noClient(const char* comPort) {
+Sensor Server::noClient(const char* comPort) {
         this->sensor.update(comPort);
 
         DynamicJsonDocument json(256);
@@ -299,4 +300,5 @@ void Server::noClient(const char* comPort) {
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
         saveReadingsToFile(jsonResponse);
+        return this->sensor;
 }

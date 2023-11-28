@@ -12,8 +12,8 @@ class Server
 	int newHistory = 0;
 public:
 	int createServer();
-	int handleClient(const char* comPort);
-	void noClient(const char* comPort);
+	int handleClient(const char* comPort, Sensor sensor);
+	Sensor noClient(const char* comPort);
 	int saveReadingsToFile(char readingsJSON[256]);
 	void loadCalibration();
 };
