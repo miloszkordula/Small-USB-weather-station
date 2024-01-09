@@ -21,13 +21,6 @@ class Sensor
     double dewpB = 0;
 
 public:
-    Sensor();
-    Sensor(const Sensor& other);
-    Sensor(Sensor&& other) noexcept;
-    Sensor& operator=(const Sensor& other);
-    Sensor& operator=(Sensor&& other) noexcept;
-    ~Sensor();
-
     int update(const char* comPort);
     
     double getTemperature();
@@ -51,6 +44,6 @@ public:
 
     void saveCalibration(std::string calibration);
     
-
+   
 };
 

@@ -4,7 +4,6 @@
 #include <iomanip>
 #include <fstream>
 #include <iostream>
-#include <ArduinoJson.h>
 
 int Sensor::update(const char* comPort) {
     serialib serial;
@@ -19,7 +18,7 @@ int Sensor::update(const char* comPort) {
 
     while (strlen(buffer) < 10) {
         serial.readString(buffer, '\n', 128, 4000);
-        printf("String read: %s\n", buffer);
+        printf("Data read: %s\n", buffer);
         std::istringstream iss(buffer);
         while (iss) {
             std::string token;
@@ -133,8 +132,8 @@ void Sensor::saveCalibration(std::string calibration) {
 
     file.open(file_path, std::ios::trunc);
     if (file.is_open()) {
-        file << calibration; // Write string data to the file
-        file.close(); // Close the file
+        file << calibration;
+        file.close();
         std::cout << "Calibration written to file successfully." << std::endl;
     }
     else {
@@ -142,81 +141,3 @@ void Sensor::saveCalibration(std::string calibration) {
     }
 }
 
-Sensor::Sensor(){}
-
-Sensor::Sensor(const Sensor& other) {
-    temperature = other.temperature;
-    pressure = other.pressure;
-    humidity = other.humidity;
-    dewPoint = other.dewPoint;
-    time = other.time;
-    localTime = other.localTime;
-    tempA = other.tempA;
-    tempB = other.tempB;
-    humiA = other.humiA;
-    humiB = other.humiB;
-    presA = other.presA;
-    presB = other.presB;
-    dewpA = other.dewpA;
-    dewpB = other.dewpB;
-}
-
-// Move constructor
-Sensor::Sensor(Sensor&& other) noexcept {
-    temperature = std::move(other.temperature);
-    pressure = std::move(other.pressure);
-    humidity = std::move(other.humidity);
-    dewPoint = std::move(other.dewPoint);
-    time = std::move(other.time);
-    localTime = std::move(other.localTime);
-    tempA = std::move(other.tempA);
-    tempB = std::move(other.tempB);
-    humiA = std::move(other.humiA);
-    humiB = std::move(other.humiB);
-    presA = std::move(other.presA);
-    presB = std::move(other.presB);
-    dewpA = std::move(other.dewpA);
-    dewpB = std::move(other.dewpB);
-}
-
-// Copy assignment operator
- Sensor& Sensor::operator=(const Sensor& other) {
-    if (this != &other) {
-        temperature = other.temperature;
-        pressure = other.pressure;
-        humidity = other.humidity;
-        dewPoint = other.dewPoint;
-        time = other.time;
-        localTime = other.localTime;
-        tempA = other.tempA;
-        tempB = other.tempB;
-        humiA = other.humiA;
-        humiB = other.humiB;
-        presA = other.presA;
-        presB = other.presB;
-        dewpA = other.dewpA;
-        dewpB = other.dewpB;
-    }
-    return *this;
-}
-
-// Move assignment operator
-Sensor& Sensor::operator=(Sensor&& other) noexcept {
-    if (this != &other) {
-        temperature = std::move(other.temperature);
-        pressure = std::move(other.pressure);
-        humidity = std::move(other.humidity);
-        dewPoint = std::move(other.dewPoint);
-        time = std::move(other.time);
-        localTime = std::move(other.localTime);
-        tempA = std::move(other.tempA);
-        tempB = std::move(other.tempB);
-        humiA = std::move(other.humiA);
-        humiB = std::move(other.humiB);
-        presA = std::move(other.presA);
-        presB = std::move(other.presB);
-        dewpA = std::move(other.dewpA);
-        dewpB = std::move(other.dewpB);
-    }
-    return *this;
-}

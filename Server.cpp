@@ -6,7 +6,7 @@
 int Server::createServer() {
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = INADDR_ANY;
-    serverAddress.sin_port = htons(7777);
+    serverAddress.sin_port = htons(80);
     
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != NO_ERROR)
@@ -37,7 +37,6 @@ int Server::createServer() {
     printf("server created\n");
     this->mainSocket = mainSocket;
     loadCalibration();
-<<<<<<< HEAD
     std::string filename = "history.json";
     std::fstream file(filename, std::ios::in | std::ios::out | std::ios::ate);
 
@@ -62,13 +61,10 @@ int Server::createServer() {
         }
     }
 
-=======
->>>>>>> parent of 98191b9 (Added better history file handling and temperature tendency)
     return 0;
 }
 
-int Server::handleClient(const char* comPort, Sensor s) {
-    this->sensor = s;
+int Server::handleClient(const char* comPort) {
     SOCKET clientSocket = accept(mainSocket, NULL, NULL);
     if (clientSocket == INVALID_SOCKET) {
         std::cerr << "Accept failed." << std::endl;
@@ -86,8 +82,6 @@ int Server::handleClient(const char* comPort, Sensor s) {
     }
 
     std::string request(buffer, bytesRead);
-
-    
 
     if (request.find("GET /index.html") != std::string::npos) {
         std::ifstream file("./html/index.html");
@@ -129,19 +123,19 @@ int Server::handleClient(const char* comPort, Sensor s) {
         }
     }
     else if (request.find("GET /sensorReadings") != std::string::npos) {
-        //this->sensor.update(comPort);
+        this->sensor.update(comPort);
 
         DynamicJsonDocument json(256);
         json["status"] = "ok";
-        json["temperature"] = this->sensor.getTemperature();
-        json["pressure"] = this->sensor.getPressure();
-        json["dewPoint"] = this->sensor.getDewPoint();
-        json["humidity"] = this->sensor.getHumidity();
-        json["timeStamp"] = this->sensor.getTime();
+        json["temperature"] = sensor.getTemperature();
+        json["pressure"] = sensor.getPressure();
+        json["dewPoint"] = sensor.getDewPoint();
+        json["humidity"] = sensor.getHumidity();
+        json["timeStamp"] = sensor.getTime();
 
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
-        //saveReadingsToFile(jsonResponse);
+        saveReadingsToFile(jsonResponse);
         if (sensor.getTime() != "") {
             std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
                 + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
@@ -209,13 +203,13 @@ int Server::handleClient(const char* comPort, Sensor s) {
 
         char jsonResponse[1024] = "";
         serializeJson(json, jsonResponse);
+        //saveReadingsToFile(jsonResponse);
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
             + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
         send(clientSocket, response.c_str(), response.length(), 0);
         }
     else if (request.find("POST /submitValues") != std::string::npos) {
         std::string requestBody = request.substr(request.find("\r\n\r\n") + 4);
-
         StaticJsonDocument<1024> doc;
         DeserializationError error = deserializeJson(doc, requestBody);
 
@@ -249,7 +243,6 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
         std::cout << "Error opening the file!" << std::endl;
         return 1;
     }
-<<<<<<< HEAD
     if (newHistory == 0) {
         file << ',' << std::endl << readingsJSON;
         file.close();
@@ -259,12 +252,7 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
         file.close();
         newHistory = 0;
     }
-=======
-    file << ',' << std::endl << readingsJSON;
-    file.close();
-
     std::cout << "Readings saved" << std::endl;
->>>>>>> parent of 98191b9 (Added better history file handling and temperature tendency)
     return 0;
 }
 
@@ -294,21 +282,4 @@ void Server::loadCalibration() {
             doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"]);
        std::cout << "Calibration loaded\n";
     }
-}
-
-Sensor Server::noClient(const char* comPort) {
-        this->sensor.update(comPort);
-
-        DynamicJsonDocument json(256);
-        json["status"] = "ok";
-        json["temperature"] = sensor.getTemperature();
-        json["pressure"] = sensor.getPressure();
-        json["dewPoint"] = sensor.getDewPoint();
-        json["humidity"] = sensor.getHumidity();
-        json["timeStamp"] = sensor.getTime();
-
-        char jsonResponse[256] = "";
-        serializeJson(json, jsonResponse);
-        saveReadingsToFile(jsonResponse);
-        return this->sensor;
 }
