@@ -64,7 +64,7 @@ int Server::createServer() {
     return 0;
 }
 
-int Server::handleClient(const char* comPort) {
+int Server::handleClient() {
     SOCKET clientSocket = accept(mainSocket, NULL, NULL);
     if (clientSocket == INVALID_SOCKET) {
         std::cerr << "Accept failed." << std::endl;
@@ -123,7 +123,7 @@ int Server::handleClient(const char* comPort) {
         }
     }
     else if (request.find("GET /sensorReadings") != std::string::npos) {
-        this->sensor.update(comPort);
+        this->sensor.update();
 
         DynamicJsonDocument json(256);
         json["status"] = "ok";
@@ -200,7 +200,7 @@ int Server::handleClient(const char* comPort) {
         json["presB"] = this->sensor.getPresB();
         json["dewpA"] = this->sensor.getDewpA();
         json["dewpB"] = this->sensor.getDewpB();
-
+        json["comPort"] = this->sensor.getSerialPort();
         char jsonResponse[1024] = "";
         serializeJson(json, jsonResponse);
         //saveReadingsToFile(jsonResponse);
@@ -219,7 +219,7 @@ int Server::handleClient(const char* comPort) {
         }
 
         this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
-            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"] );
+            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"], doc["comPort"]);
         std::cout << "Calibration done\n";
         this->sensor.saveCalibration(requestBody);
 
@@ -279,7 +279,7 @@ void Server::loadCalibration() {
     }
     else {
        this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
-            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"]);
+            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"], doc["comPort"]);
        std::cout << "Calibration loaded\n";
     }
 }

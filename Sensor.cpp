@@ -3,13 +3,15 @@
 #include <chrono>
 #include <iomanip>
 #include <fstream>
+#include <cstring>
 #include <iostream>
 
-int Sensor::update(const char* comPort) {
+int Sensor::update() {
     serialib serial;
-    char errorOpening = serial.openDevice(comPort, 9600);
+
+    char errorOpening = serial.openDevice(this->serialPort, 9600);
     if (errorOpening != 1) {
-        printf("Error connecting to %s %i\n",comPort, (int)errorOpening);
+        printf("Error connecting to %s %i\n",this->serialPort, (int)errorOpening);
         return errorOpening;
     }
 
@@ -99,8 +101,13 @@ double Sensor::getDewpB() {
     return this->dewpB;
 }
 
+const char* Sensor::getSerialPort() {
+    return this->serialPort;
+}
+
 void Sensor::setCalibration(double tempA, double tempB, double humiA,
-    double humiB, double presA, double presB, double dewpA, double dewpB) {
+    double humiB, double presA, double presB, double dewpA,
+    double dewpB, const char* comPort) {
     if (tempA <= 0) tempA = 1;
     if (humiA <= 0) humiA = 1;
     if (presA <= 0) presA = 1;
@@ -113,6 +120,7 @@ void Sensor::setCalibration(double tempA, double tempB, double humiA,
     this->dewpB = presB;
     this->dewpA = dewpA;
     this->dewpB = dewpB;
+    this->serialPort = _strdup(comPort);
 }
 
 void Sensor::restoreCalibration() {
@@ -124,6 +132,7 @@ void Sensor::restoreCalibration() {
     this->presB = 0;
     this->dewpA = 1;
     this->dewpB = 0;
+    this->serialPort = "\\\\.\\COM4";
 }
 
 void Sensor::saveCalibration(std::string calibration) {

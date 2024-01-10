@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "Server.h"
 
-const char* serialPort = "\\\\.\\COM3";
 int error = 0;
 
 int main(){
@@ -11,7 +10,7 @@ int main(){
     error = server.createServer();
     if (error == 1) return 1;
     while (true) {
-        error = server.handleClient(serialPort);
+        error = server.handleClient();
         if (error == 1) return 1;
     }
 

@@ -2,6 +2,7 @@ var temperatureGaugeDiv = document.getElementById("temperature-gauge");
 var humidityGaugeDiv = document.getElementById("humidity-gauge");
 var pressureGaugeDiv = document.getElementById("pressure-gauge");
 var dewPointGaugeDiv = document.getElementById("dewPoint-gauge");
+var comPort;
 
 let temperatureArray = [];
 let humidityArray = [];
@@ -24,6 +25,8 @@ fetch('/calibrationValues')
 
         document.getElementById('dewp-a').value = jsonResponse.dewpA;
         document.getElementById('dewp-b').value = jsonResponse.dewpB;
+
+        comPort = jsonResponse.comPort;
 }).catch(error => {
     console.error('Error fetching default values:', error);
 });
@@ -57,7 +60,8 @@ document.getElementById('calibration-input').addEventListener('submit', function
             presA: presA,
             presB: presB,
             dewpA: dewpA,
-            dewpB: dewpB
+            dewpB: dewpB,
+            comPort: comPort
         })
     }).then(response => {
         // Handle the response from the backend if required

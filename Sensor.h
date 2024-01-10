@@ -20,8 +20,10 @@ class Sensor
     double dewpA = 1;
     double dewpB = 0;
 
+    const char* serialPort = "\\\\.\\COM4";
+
 public:
-    int update(const char* comPort);
+    int update();
     
     double getTemperature();
     double getPressure();
@@ -38,8 +40,11 @@ public:
     double getDewpA();
     double getDewpB();
 
+    const char* getSerialPort();
+
     void setCalibration(double tempA, double tempB, double humiA,
-        double humiB, double presA, double presB, double dewpA, double dewpB);
+        double humiB, double presA, double presB, double dewpA,
+        double dewpB, const char* comPort);
     void restoreCalibration();
 
     void saveCalibration(std::string calibration);
