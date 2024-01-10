@@ -163,7 +163,28 @@ fetch(`/history`)
             margin: { t: 40, b: 80, pad: 5 },
         };
     });
-// Gauge Data
+
+
+function findClosestReading() {
+    const currentTime = new Date();
+    let referenceTime = new Date(currentTime.getTime() - (1 * 60 * 60 * 1000));
+
+    const targetDate = new Date(referenceTime);
+    let closestIndex = 0;
+    let closestDiff = Math.abs(targetDate - new Date(timeStampArray[0]));
+
+    for (let i = 1; i < timeStampArray.length; i++) {
+        const currentDiff = Math.abs(targetDate - new Date(timeStampArray[i]));
+        if (currentDiff < closestDiff) {
+            closestDiff = currentDiff;
+            closestIndex = i;
+        }
+    }
+
+    console.error('Error submitting values:', closestIndex);
+    return closestIndex;
+}
+
 var temperatureData = [
     {
         domain: { x: [0, 1], y: [0, 1] },
@@ -171,18 +192,13 @@ var temperatureData = [
         title: { text: "Temperature" },
         type: "indicator",
         mode: "gauge+number+delta",
-        //delta: { reference: 30 },
+        delta: { reference: 0 },
         gauge: {
             axis: { range: [-10, 40] },
             steps: [
                 { range: [10, 30], color: "lightgray" },
                 { range: [18, 25], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 30,
-            //},
         },
     },
 ];
@@ -194,18 +210,13 @@ var humidityData = [
         title: { text: "Humidity" },
         type: "indicator",
         mode: "gauge+number+delta",
-        //delta: { reference: 50 },
+        delta: { reference: 0 },
         gauge: {
             axis: { range: [null, 100] },
             steps: [
                 { range: [20, 80], color: "lightgray" },
                 { range: [40, 60], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 20,
-            //},
         },
     },
 ];
@@ -217,18 +228,13 @@ var pressureData = [
         title: { text: "Pressure" },
         type: "indicator",
         mode: "gauge+number+delta",
-        //delta: { reference: 750 },
+        delta: { reference: 0 },
         gauge: {
             axis: { range: [900, 1100] },
             steps: [
                 { range: [950, 1050], color: "lightgray" },
                 { range: [980, 1020], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 1050,
-            //},
         },
     },
 ];
@@ -240,18 +246,13 @@ var dewPointData = [
         title: { text: "Dew Point" },
         type: "indicator",
         mode: "gauge+number+delta",
-      //  delta: { reference: 60 },
+        delta: { reference: 0 },
         gauge: {
             axis: { range: [-20, 30] },
             steps: [
                 { range: [0, 20], color: "lightgray" },
                 { range: [8, 15], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 0,
-            //},
         },
     },
 ];
@@ -263,11 +264,9 @@ Plotly.newPlot(humidityGaugeDiv, humidityData, layout);
 Plotly.newPlot(pressureGaugeDiv, pressureData, layout);
 Plotly.newPlot(dewPointGaugeDiv, dewPointData, layout);
 
-// The maximum number of data points displayed on our scatter/line graph
 let MAX_GRAPH_POINTS = 65536;
 let ctr = 0;
 
-// Callback function that will retrieve our latest sensor readings and redraw our Gauge with the latest readings
 function updateSensorReadings() {
     fetch(`/sensorReadings`)
         .then((response) => response.json())
@@ -282,36 +281,6 @@ function updateSensorReadings() {
 
             updateGauge(temperature, humidity, pressure, dewPoint);
 
-            // Update Temperature Line Chart
-            //timeStampArray.push(timeStamp);
-            //updateCharts(
-            //    temperatureHistoryDiv,
-            //    timeStampArray,
-            //    temperatureArray,
-            //    temperature,
-            //);
-            //// Update Humidity Line Chart
-            //updateCharts(
-            //    humidityHistoryDiv,
-            //    timeStampArray,
-            //    humidityArray,
-            //    humidity,
-            //);
-            //// Update Pressure Line Chart
-            //updateCharts(
-            //    pressureHistoryDiv,
-            //    timeStampArray,
-            //    pressureArray,
-            //    pressure,
-            //);
-
-            //// Update dewPoint Line Chart
-            //updateCharts(
-            //    dewPointHistoryDiv,
-            //    timeStampArray,
-            //    dewPointArray,
-            //    dewPoint,
-            //);
         });
 }
 
@@ -328,17 +297,23 @@ function updateBoxes(temperature, humidity, pressure, dewPoint) {
 }
 
 function updateGauge(temperature, humidity, pressure, dewPoint) {
+    const referenceReadings = findClosestReading();
     var temperature_update = {
         value: temperature,
+        delta: { reference: temperatureArray[referenceReadings] },
+
     };
     var humidity_update = {
         value: humidity,
+        delta: { reference: humidityArray[referenceReadings] },
     };
     var pressure_update = {
         value: pressure,
+        delta: { reference: pressureArray[referenceReadings] },
     };
     var dewPoint_update = {
         value: dewPoint,
+        delta: { reference: dewPointArray[referenceReadings] },
     };
     Plotly.update(temperatureGaugeDiv, temperature_update);
     Plotly.update(humidityGaugeDiv, humidity_update);
@@ -346,26 +321,7 @@ function updateGauge(temperature, humidity, pressure, dewPoint) {
     Plotly.update(dewPointGaugeDiv, dewPoint_update);
 }
 
-//function updateCharts(lineChartDiv, xArray, yArray, sensorRead) {
-//    if (xArray.length >= MAX_GRAPH_POINTS) {
-//        xArray.shift();
-//    }
-//    if (yArray.length >= MAX_GRAPH_POINTS) {
-//        yArray.shift();
-//    }
-//    yArray.push(sensorRead);
 
-//    var data_update = {
-//        x: [xArray],
-//        y: [yArray],
-//    };
-
-//    Plotly.update(lineChartDiv, data_update);
-//}
-
-
-
-// Continuos loop that runs evry 3 seconds to update our web page with the latest sensor readings
 (function loop() {
     setTimeout(() => {
         updateSensorReadings();

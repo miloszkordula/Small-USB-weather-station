@@ -135,7 +135,6 @@ function findClosestReading() {
 }
 
 
-// Gauge Data
 var temperatureData = [
     {
         domain: { x: [0, 1], y: [0, 1] },
@@ -150,11 +149,6 @@ var temperatureData = [
                 { range: [10, 30], color: "lightgray" },
                 { range: [18, 25], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 30,
-            //},
         },
     },
 ];
@@ -173,11 +167,6 @@ var humidityData = [
                 { range: [20, 80], color: "lightgray" },
                 { range: [40, 60], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 20,
-            //},
         },
     },
 ];
@@ -196,11 +185,6 @@ var pressureData = [
                 { range: [950, 1050], color: "lightgray" },
                 { range: [980, 1020], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 1050,
-            //},
         },
     },
 ];
@@ -219,11 +203,6 @@ var dewPointData = [
                 { range: [0, 20], color: "lightgray" },
                 { range: [8, 15], color: "gray" },
             ],
-            //threshold: {
-            //    line: { color: "red", width: 4 },
-            //    thickness: 0.75,
-            //    value: 0,
-            //},
         },
     },
 ];
@@ -235,11 +214,10 @@ Plotly.newPlot(humidityGaugeDiv, humidityData, layout);
 Plotly.newPlot(pressureGaugeDiv, pressureData, layout);
 Plotly.newPlot(dewPointGaugeDiv, dewPointData, layout);
 
-// The maximum number of data points displayed on our scatter/line graph
 let MAX_GRAPH_POINTS = 65536;
 let ctr = 0;
 
-// Callback function that will retrieve our latest sensor readings and redraw our Gauge with the latest readings
+
 function updateSensorReadings() {
   fetch(`/sensorReadings`)
     .then((response) => response.json())
@@ -254,7 +232,6 @@ function updateSensorReadings() {
 
       updateGauge(temperature, humidity, pressure, dewPoint);
 
-      // Update Temperature Line Chart
        timeStampArray.push(timeStamp);
       updateCharts(
         temperatureHistoryDiv,
@@ -262,14 +239,14 @@ function updateSensorReadings() {
         temperatureArray,
         temperature,
       );
-      // Update Humidity Line Chart
+
       updateCharts(
         humidityHistoryDiv,
         timeStampArray,
         humidityArray,
         humidity,
       );
-      // Update Pressure Line Chart
+
       updateCharts(
         pressureHistoryDiv,
         timeStampArray,
@@ -277,7 +254,6 @@ function updateSensorReadings() {
         pressure,
       );
 
-      // Update dewPoint Line Chart
       updateCharts(
         dewPointHistoryDiv,
         timeStampArray,

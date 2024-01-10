@@ -19,8 +19,13 @@ int Sensor::update() {
     Sensor sensor;
 
     while (strlen(buffer) < 10) {
+        std::time_t now = (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+        localtime_s(&this->localTime, &now);
+        std::stringstream ss;
+        ss << std::put_time(&this->localTime, "%Y-%m-%dT%H:%M:%S");
         serial.readString(buffer, '\n', 128, 4000);
-        printf("Data read: %s\n", buffer);
+        std::cout << ss.str();
+        printf(" Data read: %s", buffer);
         std::istringstream iss(buffer);
         while (iss) {
             std::string token;
@@ -40,10 +45,7 @@ int Sensor::update() {
             (this->temperature - (14.55 + 0.114 * this->temperature) * (1 - (0.01 * this->humidity)) 
             - pow(((2.5 + 0.007 * this->temperature) * (1 - (0.01 * this->humidity))), 3) 
             - (15.9 + 0.117 * this->temperature) * pow((1 - (0.01 * this->humidity)), 14));
-        std::time_t now = (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        localtime_s(&this->localTime, &now);
-        std::stringstream ss;
-        ss << std::put_time(&this->localTime , "%Y-%m-%dT%H:%M:%S");
+      
         this->time = ss.str();
     }
     return 1;

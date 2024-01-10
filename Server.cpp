@@ -201,9 +201,9 @@ int Server::handleClient() {
         json["dewpA"] = this->sensor.getDewpA();
         json["dewpB"] = this->sensor.getDewpB();
         json["comPort"] = this->sensor.getSerialPort();
+
         char jsonResponse[1024] = "";
         serializeJson(json, jsonResponse);
-        //saveReadingsToFile(jsonResponse);
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
             + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
         send(clientSocket, response.c_str(), response.length(), 0);
@@ -252,7 +252,6 @@ int Server::saveReadingsToFile(char readingsJSON[256]) {
         file.close();
         newHistory = 0;
     }
-    std::cout << "Readings saved" << std::endl;
     return 0;
 }
 
