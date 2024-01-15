@@ -144,6 +144,7 @@
     <ClInclude Include="Server.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="config.cfg" />
     <None Include="html\calibration.html" />
     <None Include="html\calibration.js" />
     <None Include="html\index.html" />

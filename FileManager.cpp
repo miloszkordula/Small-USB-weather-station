@@ -1,7 +1,7 @@
 #include "FileManager.h"
 
 
-void FileManager::checkHistory(int newHistory) {
+int FileManager::checkHistory(int newHistory) {
     std::fstream file(historyPath, std::ios::in | std::ios::out | std::ios::ate);
 
     if (!file.is_open()) {
@@ -26,14 +26,16 @@ void FileManager::checkHistory(int newHistory) {
             std::cout << "History file already exists.\n";
         }
     }
+    return newHistory;
 }
 
-int FileManager::loadHistory(std::string history) {
+std::string  FileManager::loadHistory() {
+    std::string history;
     std::ifstream file(historyPath);
 
     if (!file.is_open()) {
         std::cout << "Error opening the file!" << std::endl;
-        return 0;
+        return "";
     }
     else {
         std::string line;
@@ -42,7 +44,7 @@ int FileManager::loadHistory(std::string history) {
         }
         file.close();
         history += " \n]";
-        return 1;
+        return history;
     }
 }
 
@@ -54,19 +56,19 @@ int FileManager::saveReadings(char readingsJSON[256], int newHistory) {
         std::cout << "Error opening the file!" << std::endl;
         return 1;
     }
-    if (newHistory == 0) {
+    if (newHistory == 0 && readingsJSON[0] == '{') {
         file << ',' << std::endl << readingsJSON;
         file.close();
     }
-    else {
-        file << std::endl << readingsJSON;
+    else if (readingsJSON[0] == '{') {
+        file << readingsJSON;
         file.close();
         newHistory = 0;
     }
     return 0;
 }
 
-void FileManager::loadCalibration(Sensor sensor) {
+Sensor FileManager::loadCalibration(Sensor sensor) {
     std::ifstream file(configPath);
     std::string fileContent, line;
 
@@ -90,6 +92,7 @@ void FileManager::loadCalibration(Sensor sensor) {
         sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
             doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"], doc["comPort"]);
         std::cout << "Calibration loaded\n";
+        return sensor;
     }
 }
 

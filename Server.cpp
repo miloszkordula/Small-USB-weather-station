@@ -36,8 +36,8 @@ int Server::createServer() {
 
     printf("Server created\n");
     this->mainSocket = mainSocket;
-    fileManager.loadCalibration(sensor);
-    fileManager.checkHistory(newHistory);
+    this->sensor=fileManager.loadCalibration(this->sensor);
+    this->newHistory = fileManager.checkHistory(this->newHistory);
 
     return 0;
 }
@@ -101,20 +101,21 @@ int Server::handleClient() {
         }
     }
     else if (request.find("GET /sensorReadings") != std::string::npos) {
-        sensor.update();
+        this->sensor.update();
 
         DynamicJsonDocument json(256);
         json["status"] = "ok";
-        json["temperature"] = sensor.getTemperature();
-        json["pressure"] = sensor.getPressure();
-        json["dewPoint"] = sensor.getDewPoint();
-        json["humidity"] = sensor.getHumidity();
-        json["timeStamp"] = sensor.getTime();
+        json["temperature"] = this->sensor.getTemperature();
+        json["pressure"] = this->sensor.getPressure();
+        json["dewPoint"] = this->sensor.getDewPoint();
+        json["humidity"] = this->sensor.getHumidity();
+        json["timeStamp"] = this->sensor.getTime();
 
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
-        fileManager.saveReadings(jsonResponse, newHistory);
-        if (sensor.getTime() != "") {
+        fileManager.saveReadings(jsonResponse, this->newHistory);
+        this->newHistory = 0;
+        if (this->sensor.getTime() != "") {
             std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
                 + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
             send(clientSocket, response.c_str(), response.length(), 0);
@@ -122,7 +123,8 @@ int Server::handleClient() {
     }
     else if (request.find("GET /history") != std::string::npos) {
         std::string history;
-        if (fileManager.loadHistory(history)) {
+        history = fileManager.loadHistory();
+        if (history !="") {
             std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
                 + std::to_string(history.length()) + "\r\n\r\n" + history;
             send(clientSocket, response.c_str(), response.length(), 0);
@@ -157,15 +159,15 @@ int Server::handleClient() {
     else if (request.find("GET /calibrationValues") != std::string::npos) {
 
         DynamicJsonDocument json(1024);
-        json["tempA"] = sensor.getTempA();
-        json["tempB"] = sensor.getTempB();
-        json["humiA"] = sensor.getHumiA();
-        json["humiB"] = sensor.getHumiB();
-        json["presA"] = sensor.getPresA();
-        json["presB"] = sensor.getPresB();
-        json["dewpA"] = sensor.getDewpA();
-        json["dewpB"] = sensor.getDewpB();
-        json["comPort"] = sensor.getSerialPort();
+        json["tempA"] = this->sensor.getTempA();
+        json["tempB"] = this->sensor.getTempB();
+        json["humiA"] = this->sensor.getHumiA();
+        json["humiB"] = this->sensor.getHumiB();
+        json["presA"] = this->sensor.getPresA();
+        json["presB"] = this->sensor.getPresB();
+        json["dewpA"] = this->sensor.getDewpA();
+        json["dewpB"] = this->sensor.getDewpB();
+        json["comPort"] = this->sensor.getSerialPort();
 
         char jsonResponse[1024] = "";
         serializeJson(json, jsonResponse);
@@ -183,7 +185,7 @@ int Server::handleClient() {
             return 0;
         }
 
-        sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
+        this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
             doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"], doc["comPort"]);
         std::cout << "Calibration done\n";
         fileManager.saveCalibration(requestBody);

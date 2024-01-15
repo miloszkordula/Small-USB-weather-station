@@ -30,79 +30,79 @@ int Sensor::update() {
             iss >> token;
 
             if (token == "Temperature") {
-                iss >> token >> temperature >> token >> token;
+                iss >> token >> this->temperature >> token >> token;
             }
             if (token == "Pressure") {
-                iss >> token >> pressure >> token >> token;
+                iss >> token >> this->pressure >> token >> token;
             }
             if (token == "Humidity") {
-                iss >> token >> humidity >> token >> token;
+                iss >> token >> this->humidity >> token >> token;
             }
         }
-        dewPoint = 
-            (temperature - (14.55 + 0.114 * temperature) * (1 - (0.01 * humidity)) 
-            - pow(((2.5 + 0.007 * temperature) * (1 - (0.01 * humidity))), 3) 
-            - (15.9 + 0.117 * temperature) * pow((1 - (0.01 * humidity)), 14));
+        this->dewPoint =
+            (this->temperature - (14.55 + 0.114 * this->temperature) * (1 - (0.01 * this->humidity))
+            - pow(((2.5 + 0.007 * this->temperature) * (1 - (0.01 * this->humidity))), 3)
+            - (15.9 + 0.117 * this->temperature) * pow((1 - (0.01 * this->humidity)), 14));
       
-        time = ss.str();
+        this->time = ss.str();
     }
     return 1;
 }
 
 double Sensor::getTemperature() {
-    return ((temperature) + 273.15) * tempA + tempB - 273.15;
+    return ((this->temperature) + 273.15) * this->tempA + this->tempB - 273.15;
 }
 
 double Sensor::getPressure() {
-    return pressure * presA + presB;
+    return this->pressure * this->presA + this->presB;
 }
 
 double Sensor::getHumidity() {
-    return humidity * humiA + humiB;
+    return this->humidity * this->humiA + this->humiB;
 }
 
 double Sensor::getDewPoint() {
-    return ((dewPoint) + 273.15) * dewpA + dewpB - 273.15;
+    return ((this->dewPoint) + 273.15) * this->dewpA + this->dewpB - 273.15;
 }
 
 std::string Sensor::getTime() {
-    return time;
+    return this->time;
 }
 
 double Sensor::getTempA() {
-    return tempA;
+    return this->tempA;
 }
 
 double Sensor::getTempB() {
-    return tempB;
+    return this->tempB;
 }
 
 double Sensor::getHumiA() {
-    return humiA;
+    return this->humiA;
 }
 
 double Sensor::getHumiB() {
-    return humiB;
+    return this->humiB;
 }
 
 double Sensor::getPresA() {
-    return presA;
+    return this->presA;
 }
 
 double Sensor::getPresB() {
-    return presB;
+    return this->presB;
 }
 
 double Sensor::getDewpA() {
-    return dewpA;
+    return this->dewpA;
 }
 
 double Sensor::getDewpB() {
-    return dewpB;
+    return this->dewpB;
 }
 
 const char* Sensor::getSerialPort() {
-    return serialPort;
+    return this->serialPort;
 }
 
 void Sensor::setCalibration(double tempA, double tempB, double humiA,
@@ -124,15 +124,15 @@ void Sensor::setCalibration(double tempA, double tempB, double humiA,
 }
 
 void Sensor::restoreCalibration() {
-    tempA = 1;
-    tempB = -4;
-    humiA = 1;
-    humiB = 0;
-    presA = 1;
-    presB = 0;
-    dewpA = 1;
-    dewpB = 0;
-    serialPort = "\\\\.\\COM4";
+    this->tempA = 1;
+    this->tempB = -4;
+    this->humiA = 1;
+    this->humiB = 0;
+    this->presA = 1;
+    this->presB = 0;
+    this->dewpA = 1;
+    this->dewpB = 0;
+    this->serialPort = "\\\\.\\COM4";
 }
 
 

@@ -64,5 +64,8 @@
     <None Include="html\calibration.js">
       <Filter>html</Filter>
     </None>
+    <None Include="config.cfg">
+      <Filter>Pliki zasobów</Filter>
+    </None>
   </ItemGroup>
 </Project>

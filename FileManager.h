@@ -9,11 +9,11 @@ std::string configPath = "config.cfg";
 
 
 public:
-	void checkHistory(int newHistory);
-	int loadHistory(std::string history);
+	int checkHistory(int newHistory);
+	std::string loadHistory();
 	int saveReadings(char readingsJSON[256], int newHistory);
 	
-	void loadCalibration(Sensor sensor);
+	Sensor loadCalibration(Sensor sensor);
 	void saveCalibration(std::string calibration);
 };
 
