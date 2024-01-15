@@ -2,9 +2,7 @@
 #include "lib/serialib.h"
 #include <chrono>
 #include <iomanip>
-#include <fstream>
 #include <cstring>
-#include <iostream>
 
 int Sensor::update() {
     serialib serial;
@@ -32,79 +30,79 @@ int Sensor::update() {
             iss >> token;
 
             if (token == "Temperature") {
-                iss >> token >> this->temperature >> token >> token;
+                iss >> token >> temperature >> token >> token;
             }
             if (token == "Pressure") {
-                iss >> token >> this->pressure >> token >> token;
+                iss >> token >> pressure >> token >> token;
             }
             if (token == "Humidity") {
-                iss >> token >> this->humidity >> token >> token;
+                iss >> token >> humidity >> token >> token;
             }
         }
-        this->dewPoint = 
-            (this->temperature - (14.55 + 0.114 * this->temperature) * (1 - (0.01 * this->humidity)) 
-            - pow(((2.5 + 0.007 * this->temperature) * (1 - (0.01 * this->humidity))), 3) 
-            - (15.9 + 0.117 * this->temperature) * pow((1 - (0.01 * this->humidity)), 14));
+        dewPoint = 
+            (temperature - (14.55 + 0.114 * temperature) * (1 - (0.01 * humidity)) 
+            - pow(((2.5 + 0.007 * temperature) * (1 - (0.01 * humidity))), 3) 
+            - (15.9 + 0.117 * temperature) * pow((1 - (0.01 * humidity)), 14));
       
-        this->time = ss.str();
+        time = ss.str();
     }
     return 1;
 }
 
 double Sensor::getTemperature() {
-    return ((this->temperature) + 273.15) * this->tempA + this->tempB - 273.15;
+    return ((temperature) + 273.15) * tempA + tempB - 273.15;
 }
 
 double Sensor::getPressure() {
-    return this->pressure * this->presA + this->presB;
+    return pressure * presA + presB;
 }
 
 double Sensor::getHumidity() {
-    return this->humidity * this->humiA + this->humiB;
+    return humidity * humiA + humiB;
 }
 
 double Sensor::getDewPoint() {
-    return ((this->dewPoint) + 273.15) * this->dewpA + this->dewpB - 273.15;
+    return ((dewPoint) + 273.15) * dewpA + dewpB - 273.15;
 }
 
 std::string Sensor::getTime() {
-    return this->time;
+    return time;
 }
 
 double Sensor::getTempA() {
-    return this->tempA;
+    return tempA;
 }
 
 double Sensor::getTempB() {
-    return this->tempB;
+    return tempB;
 }
 
 double Sensor::getHumiA() {
-    return this->humiA;
+    return humiA;
 }
 
 double Sensor::getHumiB() {
-    return this->humiB;
+    return humiB;
 }
 
 double Sensor::getPresA() {
-    return this->presA;
+    return presA;
 }
 
 double Sensor::getPresB() {
-    return this->presB;
+    return presB;
 }
 
 double Sensor::getDewpA() {
-    return this->dewpA;
+    return dewpA;
 }
 
 double Sensor::getDewpB() {
-    return this->dewpB;
+    return dewpB;
 }
 
 const char* Sensor::getSerialPort() {
-    return this->serialPort;
+    return serialPort;
 }
 
 void Sensor::setCalibration(double tempA, double tempB, double humiA,
@@ -126,29 +124,16 @@ void Sensor::setCalibration(double tempA, double tempB, double humiA,
 }
 
 void Sensor::restoreCalibration() {
-    this->tempA = 1;
-    this->tempB = -4;
-    this->humiA = 1;
-    this->humiB = 0;
-    this->presA = 1;
-    this->presB = 0;
-    this->dewpA = 1;
-    this->dewpB = 0;
-    this->serialPort = "\\\\.\\COM4";
+    tempA = 1;
+    tempB = -4;
+    humiA = 1;
+    humiB = 0;
+    presA = 1;
+    presB = 0;
+    dewpA = 1;
+    dewpB = 0;
+    serialPort = "\\\\.\\COM4";
 }
 
-void Sensor::saveCalibration(std::string calibration) {
-    std::string file_path = "config.cfg";
-    std::ofstream file;
 
-    file.open(file_path, std::ios::trunc);
-    if (file.is_open()) {
-        file << calibration;
-        file.close();
-        std::cout << "Calibration written to file successfully." << std::endl;
-    }
-    else {
-        std::cerr << "Unable to open file: " << file_path << std::endl;
-    }
-}
 

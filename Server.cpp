@@ -1,7 +1,6 @@
 #include "Server.h"
-#include "ArduinoJson.h"
-#include <iostream>
-#include <fstream>
+
+
 
 int Server::createServer() {
     serverAddress.sin_family = AF_INET;
@@ -34,32 +33,11 @@ int Server::createServer() {
         WSACleanup();
         return 1;
     }
-    printf("server created\n");
-    this->mainSocket = mainSocket;
-    loadCalibration();
-    std::string filename = "history.json";
-    std::fstream file(filename, std::ios::in | std::ios::out | std::ios::ate);
 
-    if (!file.is_open()) {
-        file.open(filename, std::ios::out);
-        file << "[\n";
-        file.close();
-        newHistory = 1;
-    }
-    else {
-        file.seekg(0, std::ios::end);
-        if (file.tellg() == 0) {
-            file.close();
-            file.open(filename, std::ios::out | std::ios::app);
-            file << "[\n";
-            file.close();
-            newHistory = 1;
-        }
-        else {
-            file.close();
-            std::cout << "History already exists and is not empty.\n";
-        }
-    }
+    printf("Server created\n");
+    this->mainSocket = mainSocket;
+    fileManager.loadCalibration(sensor);
+    fileManager.checkHistory(newHistory);
 
     return 0;
 }
@@ -123,7 +101,7 @@ int Server::handleClient() {
         }
     }
     else if (request.find("GET /sensorReadings") != std::string::npos) {
-        this->sensor.update();
+        sensor.update();
 
         DynamicJsonDocument json(256);
         json["status"] = "ok";
@@ -135,7 +113,7 @@ int Server::handleClient() {
 
         char jsonResponse[256] = "";
         serializeJson(json, jsonResponse);
-        saveReadingsToFile(jsonResponse);
+        fileManager.saveReadings(jsonResponse, newHistory);
         if (sensor.getTime() != "") {
             std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
                 + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
@@ -143,21 +121,8 @@ int Server::handleClient() {
         }
     }
     else if (request.find("GET /history") != std::string::npos) {
-        std::string file_path = "history.json";
         std::string history;
-        std::ifstream file(file_path);
-
-        if (!file.is_open()) {
-            std::cout << "Error opening the file!" << std::endl;
-        }
-        else {
-            std::string line;
-            while (std::getline(file, line)) {
-                history += line + "\n";
-            }
-            file.close();
-            history += " \n]";
-
+        if (fileManager.loadHistory(history)) {
             std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
                 + std::to_string(history.length()) + "\r\n\r\n" + history;
             send(clientSocket, response.c_str(), response.length(), 0);
@@ -192,15 +157,15 @@ int Server::handleClient() {
     else if (request.find("GET /calibrationValues") != std::string::npos) {
 
         DynamicJsonDocument json(1024);
-        json["tempA"] = this->sensor.getTempA();
-        json["tempB"] = this->sensor.getTempB();
-        json["humiA"] = this->sensor.getHumiA();
-        json["humiB"] = this->sensor.getHumiB();
-        json["presA"] = this->sensor.getPresA();
-        json["presB"] = this->sensor.getPresB();
-        json["dewpA"] = this->sensor.getDewpA();
-        json["dewpB"] = this->sensor.getDewpB();
-        json["comPort"] = this->sensor.getSerialPort();
+        json["tempA"] = sensor.getTempA();
+        json["tempB"] = sensor.getTempB();
+        json["humiA"] = sensor.getHumiA();
+        json["humiB"] = sensor.getHumiB();
+        json["presA"] = sensor.getPresA();
+        json["presB"] = sensor.getPresB();
+        json["dewpA"] = sensor.getDewpA();
+        json["dewpB"] = sensor.getDewpB();
+        json["comPort"] = sensor.getSerialPort();
 
         char jsonResponse[1024] = "";
         serializeJson(json, jsonResponse);
@@ -218,10 +183,10 @@ int Server::handleClient() {
             return 0;
         }
 
-        this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
+        sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
             doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"], doc["comPort"]);
         std::cout << "Calibration done\n";
-        this->sensor.saveCalibration(requestBody);
+        fileManager.saveCalibration(requestBody);
 
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Received inputs successfully</h1></body></html>";
         send(clientSocket, response.c_str(), response.length(), 0);
@@ -234,51 +199,4 @@ int Server::handleClient() {
     return 0;
 }
 
-int Server::saveReadingsToFile(char readingsJSON[256]) {
-    std::string file_path = "history.json";
-    std::ofstream file;
 
-    file.open(file_path, std::ios::app);
-    if (!file.is_open()) {
-        std::cout << "Error opening the file!" << std::endl;
-        return 1;
-    }
-    if (newHistory == 0) {
-        file << ',' << std::endl << readingsJSON;
-        file.close();
-    }
-    else {
-        file << std::endl << readingsJSON;
-        file.close();
-        newHistory = 0;
-    }
-    return 0;
-}
-
-void Server::loadCalibration() {
-    std::string file_path = "config.cfg";
-    std::ifstream file(file_path);
-    std::string fileContent, line;
-
-    if (file.is_open()) {
-        while (std::getline(file, line)) {
-            fileContent += line;
-            fileContent += '\n';
-        }
-        file.close();
-    }
-    else {
-        std::cerr << "Unable to open file: " << file_path << std::endl;
-    }
-    StaticJsonDocument<1024> doc;
-    DeserializationError error = deserializeJson(doc, fileContent);
-
-    if (error) {
-        std::cout << "Error recieving values\n";
-    }
-    else {
-       this->sensor.setCalibration(doc["tempA"], doc["tempB"], doc["humiA"],
-            doc["humiB"], doc["presA"], doc["presB"], doc["dewpA"], doc["dewpB"], doc["comPort"]);
-       std::cout << "Calibration loaded\n";
-    }
-}

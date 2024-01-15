@@ -1,7 +1,10 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <fstream>
+#include <iostream>
 #include <time.h>
+
 class Sensor
 { 
     double temperature = 20;
@@ -46,9 +49,6 @@ public:
         double humiB, double presA, double presB, double dewpA,
         double dewpB, const char* comPort);
     void restoreCalibration();
-
-    void saveCalibration(std::string calibration);
-    
    
 };
 
