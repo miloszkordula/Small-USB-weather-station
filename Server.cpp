@@ -101,24 +101,27 @@ int Server::handleClient() {
         }
     }
     else if (request.find("GET /sensorReadings") != std::string::npos) {
-        this->sensor.update();
+        updateSuccessful = 0;
+        updateSuccessful = this->sensor.update();
 
-        DynamicJsonDocument json(256);
-        json["status"] = "ok";
-        json["temperature"] = this->sensor.getTemperature();
-        json["pressure"] = this->sensor.getPressure();
-        json["dewPoint"] = this->sensor.getDewPoint();
-        json["humidity"] = this->sensor.getHumidity();
-        json["timeStamp"] = this->sensor.getTime();
+        if (updateSuccessful == 1) {
+            DynamicJsonDocument json(256);
+            json["status"] = "ok";
+            json["temperature"] = this->sensor.getTemperature();
+            json["pressure"] = this->sensor.getPressure();
+            json["dewPoint"] = this->sensor.getDewPoint();
+            json["humidity"] = this->sensor.getHumidity();
+            json["timeStamp"] = this->sensor.getTime();
 
-        char jsonResponse[256] = "";
-        serializeJson(json, jsonResponse);
-        fileManager.saveReadings(jsonResponse, this->newHistory);
-        this->newHistory = 0;
-        if (this->sensor.getTime() != "") {
-            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
-                + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
-            send(clientSocket, response.c_str(), response.length(), 0);
+            char jsonResponse[256] = "";
+            serializeJson(json, jsonResponse);
+            fileManager.saveReadings(jsonResponse, this->newHistory);
+            this->newHistory = 0;
+            if (this->sensor.getTime() != "") {
+                std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "
+                    + std::to_string(strlen(jsonResponse)) + "\r\n\r\n" + jsonResponse;
+                send(clientSocket, response.c_str(), response.length(), 0);
+            }
         }
     }
     else if (request.find("GET /history") != std::string::npos) {

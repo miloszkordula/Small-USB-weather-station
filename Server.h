@@ -12,6 +12,7 @@ class Server
 	Sensor sensor;
 	FileManager fileManager;
 	int newHistory = 0;
+	int updateSuccessful = 0;
 
 public:
 	int createServer();

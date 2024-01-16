@@ -14,7 +14,6 @@ int Sensor::update() {
     }
 
     char buffer[128] = "";
-    Sensor sensor;
 
     while (strlen(buffer) < 10) {
         std::time_t now = (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
@@ -43,9 +42,10 @@ int Sensor::update() {
             (this->temperature - (14.55 + 0.114 * this->temperature) * (1 - (0.01 * this->humidity))
             - pow(((2.5 + 0.007 * this->temperature) * (1 - (0.01 * this->humidity))), 3)
             - (15.9 + 0.117 * this->temperature) * pow((1 - (0.01 * this->humidity)), 14));
-      
+
         this->time = ss.str();
     }
+
     return 1;
 }
 
@@ -117,7 +117,7 @@ void Sensor::setCalibration(double tempA, double tempB, double humiA,
     this->humiA = humiA;
     this->humiB = humiB;
     this->presA = presA;
-    this->dewpB = presB;
+    this->presB = presB;
     this->dewpA = dewpA;
     this->dewpB = dewpB;
     this->serialPort = _strdup(comPort);
